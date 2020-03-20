@@ -48,11 +48,6 @@ public class ControlSettingActivity extends BaseActivity implements View.OnClick
     }
 
     @Override
-    protected void messageResult(String type, String msg) {
-
-    }
-
-    @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_connected:

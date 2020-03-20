@@ -98,11 +98,6 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
     }
 
     @Override
-    protected void messageResult(String type, String msg) {
-
-    }
-
-    @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_back:

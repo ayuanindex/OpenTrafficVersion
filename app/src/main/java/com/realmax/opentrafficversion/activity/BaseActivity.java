@@ -69,14 +69,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected abstract void initData();
 
     /**
-     * 建立连接后返回处理过的流调用的方法
-     *
-     * @param type
-     * @param msg
-     */
-    protected abstract void messageResult(String type, String msg);
-
-    /**
      * 界面跳转
      *
      * @param jump 需要跳转的界面

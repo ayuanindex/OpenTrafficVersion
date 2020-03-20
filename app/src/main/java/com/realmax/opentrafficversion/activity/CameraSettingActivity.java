@@ -83,11 +83,6 @@ public class CameraSettingActivity extends BaseActivity implements View.OnClickL
         et_port.setText(camera_port + "");
     }
 
-    @Override
-    protected void messageResult(String type, String msg) {
-
-    }
-
     /**
      * 提交连接
      */
