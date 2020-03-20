@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.TextureView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridView;

@@ -48,7 +48,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="10"
-            android:src="@drawable/no_press" />
+            android:src="@drawable/pic_control" />
 
         <TextView
             android:id="@+id/tv_measure"
