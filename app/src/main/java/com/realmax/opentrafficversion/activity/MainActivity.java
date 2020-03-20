@@ -44,12 +44,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_jump_management:
+                // 交通管理界面
                 jump(ManagementActivity.class);
                 break;
             case R.id.btn_jump_camera_setting:
+                // 虚拟摄像头连接界面
                 jump(CameraSettingActivity.class);
                 break;
             case R.id.btn_jump_control_setting:
+                // 控制器连接界面
                 jump(ControlSettingActivity.class);
                 break;
         }
