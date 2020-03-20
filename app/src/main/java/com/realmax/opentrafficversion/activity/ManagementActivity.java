@@ -1,13 +1,19 @@
 package com.realmax.opentrafficversion.activity;
 
 import android.annotation.SuppressLint;
+import android.graphics.Bitmap;
+import android.os.Build;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.RequiresApi;
+
 import com.realmax.opentrafficversion.R;
+import com.realmax.opentrafficversion.utils.EncodeAndDecode;
+import com.realmax.opentrafficversion.utils.TCPLinks;
 
 public class ManagementActivity extends BaseActivity implements View.OnClickListener {
     private TextView tv_camera_state;
@@ -17,6 +23,8 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
     private TextView tv_tips;
     private GridView gv_btns;
     private Button btn_back;
+    private TCPLinks cameraTCPLink;
+    private TCPLinks remoteTCPLink;
 
     @Override
     protected int getLayoutId() {
@@ -50,6 +58,34 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
         // 判断连接状态
         tv_camera_state.setText("摄像头：" + (cameraSocket != null ? "已连接" : "未连接"));
         tv_control_state.setText("控制器：" + (remoteSocket != null ? "已连接" : "未连接"));
+
+        cameraTCPLink = new TCPLinks(cameraSocket);
+        remoteTCPLink = new TCPLinks(remoteSocket);
+
+        getImage();
+        String s = cameraTCPLink.fetch_camera();
+    }
+
+    private void getImage() {
+        new Thread() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void run() {
+                super.run();
+                if (cameraSocket != null) {
+                    while (true) {
+                        String s = cameraTCPLink.fetch_camera();
+                        Bitmap bitmap = EncodeAndDecode.decodeBase64ToImage(s);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                iv_snap_shot.setImageBitmap(bitmap);
+                            }
+                        });
+                    }
+                }
+            }
+        }.start();
     }
 
     @Override

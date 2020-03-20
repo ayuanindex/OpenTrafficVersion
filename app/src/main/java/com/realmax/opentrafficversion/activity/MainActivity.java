@@ -4,6 +4,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.realmax.opentrafficversion.R;
+import com.realmax.opentrafficversion.utils.TCPLinks;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
     private Button btn_jump_management;
@@ -56,5 +57,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 jump(ControlSettingActivity.class);
                 break;
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        TCPLinks.stop(cameraSocket);
+        TCPLinks.stop(remoteSocket);
     }
 }

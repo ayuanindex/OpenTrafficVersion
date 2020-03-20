@@ -1,7 +1,6 @@
 package com.realmax.opentrafficversion.activity;
 
 import android.annotation.SuppressLint;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
@@ -12,12 +11,11 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.realmax.opentrafficversion.App;
 import com.realmax.opentrafficversion.R;
+import com.realmax.opentrafficversion.utils.TCPLinks;
 import com.realmax.opentrafficversion.utils.SpUtil;
-import com.realmax.opentrafficversion.utils.TCPConnected;
 
 import java.net.Socket;
 
@@ -46,11 +44,7 @@ public class CameraSettingActivity extends BaseActivity implements View.OnClickL
             }
         }
     };
-
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
+    private TCPLinks cameraTcp;
 
     @Override
     protected int getLayoutId() {
@@ -94,18 +88,6 @@ public class CameraSettingActivity extends BaseActivity implements View.OnClickL
 
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btn_connected:
-                submit();
-                break;
-            case R.id.btn_back:
-                finish();
-                break;
-        }
-    }
-
     /**
      * 提交连接
      */
@@ -128,10 +110,9 @@ public class CameraSettingActivity extends BaseActivity implements View.OnClickL
         // 判断进入当前界面后最新输入的ip或端口号是否和之前的一样，如果不一样则断开之前的连接
         // 对摄像头连接的socket进行判空
         if (!(ip.equals(camera_ip) && portInt == camera_port) || cameraSocket == null) {
-            // 停止之前的连接
             cameraSocket = null;
-            TCPConnected.stop();
-            TCPConnected.start(ip, portInt, 1, new TCPConnected.ResultData() {
+            cameraTcp.stop();
+            cameraTcp.start(ip, portInt, new TCPLinks.ResultData() {
                 @Override
                 public void isConnected(Socket socket, Message message) {
                     if (socket.isConnected()) {
@@ -157,6 +138,22 @@ public class CameraSettingActivity extends BaseActivity implements View.OnClickL
             });
         } else {
             App.showToast("已连接");
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btn_connected:
+                if (cameraTcp == null) {
+                    cameraTcp = new TCPLinks();
+                    cameraTcp.setSocket(cameraSocket);
+                }
+                submit();
+                break;
+            case R.id.btn_back:
+                finish();
+                break;
         }
     }
 }
