@@ -3,6 +3,7 @@ package com.realmax.opentrafficversion.activity;
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.os.Build;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridView;
@@ -63,7 +64,6 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
         remoteTCPLink = new TCPLinks(remoteSocket);
 
         getImage();
-        String s = cameraTCPLink.fetch_camera();
     }
 
     private void getImage() {
@@ -74,6 +74,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                 super.run();
                 if (cameraSocket != null) {
                     while (true) {
+                        Log.i(TAG, "run: 哈哈和：");
                         String s = cameraTCPLink.fetch_camera();
                         Bitmap bitmap = EncodeAndDecode.decodeBase64ToImage(s);
                         runOnUiThread(new Runnable() {

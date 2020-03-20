@@ -37,6 +37,14 @@ public class TCPLinks {
 
     public TCPLinks(Socket socket) {
         this.socket = socket;
+        try {
+            if (socket != null) {
+                inputStream = socket.getInputStream();
+                outputStream = socket.getOutputStream();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -315,7 +323,6 @@ public class TCPLinks {
                     }
                 }
             } catch (IOException e) {
-                e.printStackTrace();
             }
         }
         return "";

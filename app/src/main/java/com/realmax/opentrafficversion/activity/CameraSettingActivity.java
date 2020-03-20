@@ -146,8 +146,7 @@ public class CameraSettingActivity extends BaseActivity implements View.OnClickL
         switch (v.getId()) {
             case R.id.btn_connected:
                 if (cameraTcp == null) {
-                    cameraTcp = new TCPLinks();
-                    cameraTcp.setSocket(cameraSocket);
+                    cameraTcp = new TCPLinks(cameraSocket);
                 }
                 submit();
                 break;
