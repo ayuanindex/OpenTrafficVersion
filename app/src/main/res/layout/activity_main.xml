@@ -1,71 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#0B5AB2"
-    tools:context=".MainActivity">
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context=".activity.MainActivity">
 
 
     <TextView
-        android:id="@+id/textView"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:gravity="center"
         android:padding="10dp"
         android:text="智能交通管理移动端监控平台"
         android:textColor="#ffffff"
-        android:textSize="40sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:textSize="40sp" />
 
     <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="263dp"
-        android:layout_height="192dp"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         android:layout_marginTop="24dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
+        android:layout_weight="1"
         app:srcCompat="@drawable/logo" />
 
-    <Button
-        android:id="@+id/btn_jump_management"
-        android:layout_width="169dp"
-        android:layout_height="41dp"
-        android:layout_marginBottom="20dp"
-        android:background="#ffffff"
-        android:text="进入交通管理"
-        app:layout_constraintBottom_toTopOf="@+id/btn_jump_camera_setting"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView2"
-        app:layout_constraintVertical_bias="1.0" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:gravity="center"
+        android:orientation="vertical">
 
-    <Button
-        android:id="@+id/btn_jump_camera_setting"
-        android:layout_width="169dp"
-        android:layout_height="41dp"
-        android:layout_marginBottom="20dp"
-        android:background="#ffffff"
-        android:text="摄像头设置"
-        app:layout_constraintBottom_toTopOf="@+id/btn_jump_control_setting"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        <Button
+            android:id="@+id/btn_jump_management"
+            android:layout_width="169dp"
+            android:layout_height="41dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/btn_state"
+            android:text="进入交通管理" />
 
-    <Button
-        android:id="@+id/btn_jump_control_setting"
-        android:layout_width="169dp"
-        android:layout_height="41dp"
-        android:layout_marginBottom="28dp"
-        android:background="#ffffff"
-        android:text="控制器设置"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        <Button
+            android:id="@+id/btn_jump_camera_setting"
+            android:layout_width="169dp"
+            android:layout_height="41dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/btn_state"
+            android:text="摄像头设置" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <Button
+            android:id="@+id/btn_jump_control_setting"
+            android:layout_width="169dp"
+            android:layout_height="41dp"
+            android:layout_marginBottom="28dp"
+            android:background="@drawable/btn_state"
+            android:text="控制器设置" />
+    </LinearLayout>
+</LinearLayout>

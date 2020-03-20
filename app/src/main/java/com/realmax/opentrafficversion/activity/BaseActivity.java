@@ -1,16 +1,18 @@
-package com.realmax.opentrafficversion;
+package com.realmax.opentrafficversion.activity;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 
 import androidx.annotation.LayoutRes;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.realmax.opentrafficversion.App;
+import com.realmax.opentrafficversion.Values;
 import com.realmax.opentrafficversion.bean.TokenBean;
 
 import java.net.Socket;
@@ -19,7 +21,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
-public abstract class BaseActivity extends AppCompatActivity implements View.OnClickListener {
+public abstract class BaseActivity extends AppCompatActivity {
     public final String TAG = this.getClass().getSimpleName();
     public Socket remoteSocket = null;
     public Socket cameraSocket = null;
@@ -73,6 +75,15 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
      * @param msg
      */
     protected abstract void messageResult(String type, String msg);
+
+    /**
+     * 界面跳转
+     *
+     * @param jump 需要跳转的界面
+     */
+    public <T> void jump(Class<T> jump) {
+        startActivity(new Intent(this, jump));
+    }
 
     /**
      * 获取Token
