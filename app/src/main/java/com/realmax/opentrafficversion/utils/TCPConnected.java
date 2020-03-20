@@ -1,5 +1,7 @@
 package com.realmax.opentrafficversion.utils;
 
+import android.os.Message;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -41,17 +43,20 @@ public class TCPConnected {
             @Override
             public void run() {
                 super.run();
+                Message message = Message.obtain();
                 try {
                     // 建立TCP连接
                     socket = new Socket(host, port);
+                    socket.setSoTimeout(1000);
                     // 获取输入里：获取数据
                     inputStream = socket.getInputStream();
                     // 获取输出流：发送数据
                     outputStream = socket.getOutputStream();
                     // 通过接口将连接状态返回出去
-                    resultData.isConnected(socket.isConnected());
+                    resultData.isConnected(socket, message);
                 } catch (IOException e) {
                     e.printStackTrace();
+                    resultData.error(message);
                 }
             }
         }.start();
@@ -63,7 +68,7 @@ public class TCPConnected {
     public static void stop() {
         try {
             // 关闭连接
-            if (!socket.isClosed()) {
+            if (socket != null) {
                 socket.close();
                 socket = null;
             }
@@ -308,6 +313,19 @@ public class TCPConnected {
 
     // 回调接口，后期可拓展
     public interface ResultData {
-        void isConnected(boolean isConnected);
+        /**
+         * 连接成功的回调方法
+         *
+         * @param socket
+         * @param message
+         */
+        void isConnected(Socket socket, Message message);
+
+        /**
+         * 连接失败的回调
+         *
+         * @param message
+         */
+        void error(Message message);
     }
 }
