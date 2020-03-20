@@ -38,7 +38,7 @@ public class CameraSettingActivity extends BaseActivity implements View.OnClickL
         btn_connected = (Button) findViewById(R.id.btn_connected);
         btn_back = (Button) findViewById(R.id.btn_back);
 
-        iv_logo.setImageResource(R.drawable.camera);
+        iv_logo.setImageResource(R.drawable.pic_camera);
     }
 
     @Override

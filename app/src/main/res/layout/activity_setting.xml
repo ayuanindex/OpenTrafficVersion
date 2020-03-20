@@ -17,7 +17,7 @@
         android:layout_marginTop="16dp"
         android:layout_weight="1"
         android:layout_gravity="left"
-        android:src="@drawable/control"
+        android:src="@drawable/pic_control"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

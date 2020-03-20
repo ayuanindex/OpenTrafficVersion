@@ -34,8 +34,7 @@ public class ControlSettingActivity extends BaseActivity implements View.OnClick
         btn_back = (Button) findViewById(R.id.btn_back);
         btn_back.setOnClickListener(this);
 
-
-        iv_logo.setImageResource(R.drawable.control);
+        iv_logo.setImageResource(R.drawable.pic_control);
     }
 
     @Override
