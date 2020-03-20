@@ -15,6 +15,7 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:gravity="center"
+        android:fontFamily="serif"
         android:padding="10dp"
         android:text="智能交通管理移动端监控平台"
         android:textColor="#ffffff"
