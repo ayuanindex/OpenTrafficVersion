@@ -26,6 +26,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
     private Button btn_back;
     private TCPLinks cameraTCPLink;
     private TCPLinks remoteTCPLink;
+    private boolean flag = false;
 
     @Override
     protected int getLayoutId() {
@@ -53,6 +54,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @SuppressLint("SetTextI18n")
     @Override
     protected void initData() {
@@ -66,6 +68,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
         getImage();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void getImage() {
         new Thread() {
             @RequiresApi(api = Build.VERSION_CODES.O)
@@ -73,9 +76,9 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
             public void run() {
                 super.run();
                 if (cameraSocket != null) {
-                    while (true) {
-                        Log.i(TAG, "run: 哈哈和：");
+                    while (!flag) {
                         String s = cameraTCPLink.fetch_camera();
+                        Log.i(TAG, "run: 哈哈和：" + s);
                         Bitmap bitmap = EncodeAndDecode.decodeBase64ToImage(s);
                         runOnUiThread(new Runnable() {
                             @Override
@@ -101,5 +104,11 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                 finish();
                 break;
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        flag = true;
     }
 }
