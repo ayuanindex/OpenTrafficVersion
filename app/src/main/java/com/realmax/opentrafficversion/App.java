@@ -1,14 +1,18 @@
 package com.realmax.opentrafficversion;
 
+import android.app.Activity;
 import android.app.Application;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.widget.Toast;
+
+import androidx.fragment.app.FragmentActivity;
 
 import com.google.gson.Gson;
 import com.realmax.opentrafficversion.utils.Network;
 
 public class App extends Application {
-
+    private static ProgressDialog progressDialog;
     private static Gson gson;
     private static Context context;
     private static ApiService remote;
@@ -38,5 +42,30 @@ public class App extends Application {
 
     public static ApiService getRemote() {
         return remote;
+    }
+
+    public static void showDialog(Activity activity, String msg) {
+        if (progressDialog != null) {
+            if (progressDialog.isShowing()) {
+                return;
+            }
+        }
+        progressDialog = new ProgressDialog(activity);
+        progressDialog.setTitle("提示");
+        progressDialog.setMessage(msg);
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.show();
+    }
+
+    public static void disDialog(FragmentActivity activity) {
+        if (progressDialog != null) {
+            new Thread() {
+                @Override
+                public void run() {
+                    super.run();
+                    showToast("连接失败");
+                }
+            }.start();
+        }
     }
 }

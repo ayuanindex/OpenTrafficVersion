@@ -16,7 +16,8 @@ import java.net.Socket;
 public class TCPConnected {
     private static final String TAG = "TCPConnected";
     private static StringBuilder result = new StringBuilder("");
-    private static Socket socket = null;
+    private static Socket remote = null;
+    private static Socket camera = null;
     private static boolean flag = false;
     /**
      * 输入流：读取数据
@@ -27,8 +28,12 @@ public class TCPConnected {
      */
     private static OutputStream outputStream = null;
 
-    public static Socket getSocket() {
-        return socket;
+    public static Socket getRemote() {
+        return remote;
+    }
+
+    public static Socket getCamera() {
+        return camera;
     }
 
     /**
@@ -36,24 +41,25 @@ public class TCPConnected {
      *
      * @param host       地址
      * @param port       端口号
+     * @param type       1表示摄像头2表示控制器
      * @param resultData 回调接口，返回是否已经连接成功的状态
      */
-    public static void start(String host, int port, ResultData resultData) {
+    public static void start(String host, int port, int type, ResultData resultData) {
         new Thread() {
             @Override
             public void run() {
                 super.run();
                 Message message = Message.obtain();
+
                 try {
-                    // 建立TCP连接
-                    socket = new Socket(host, port);
-                    socket.setSoTimeout(1000);
-                    // 获取输入里：获取数据
-                    inputStream = socket.getInputStream();
-                    // 获取输出流：发送数据
-                    outputStream = socket.getOutputStream();
-                    // 通过接口将连接状态返回出去
-                    resultData.isConnected(socket, message);
+                    switch (type) {
+                        case 1:
+                            tcpSetting(message, host, port, resultData, camera);
+                            break;
+                        case 2:
+                            tcpSetting(message, host, port, resultData, remote);
+                            break;
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                     resultData.error(message);
@@ -63,14 +69,37 @@ public class TCPConnected {
     }
 
     /**
+     * 设置tpc连接属性
+     *
+     * @param message
+     * @param host
+     * @param port
+     * @param resultData
+     * @param socket
+     * @throws IOException
+     */
+    private static void tcpSetting(Message message, String host, int port, ResultData resultData, Socket socket) throws IOException {
+        // 建立TCP连接
+        socket = new Socket(host, port);
+        socket.setSoTimeout(1000);
+        socket.setKeepAlive(true);
+        // 获取输入里：获取数据
+        inputStream = socket.getInputStream();
+        // 获取输出流：发送数据
+        outputStream = socket.getOutputStream();
+        // 通过接口将连接状态返回出去
+        resultData.isConnected(socket, message);
+    }
+
+    /**
      * 关闭TCP连接
      */
     public static void stop() {
         try {
             // 关闭连接
-            if (socket != null) {
-                socket.close();
-                socket = null;
+            if (remote != null) {
+                remote.close();
+                remote = null;
             }
 
             // 关闭输出流
@@ -96,7 +125,7 @@ public class TCPConnected {
      */
     public static void start_camera(String device_type, int device_id, int camera_num) {
         // 对socket进行判空处理　
-        if (socket == null) {
+        if (remote == null) {
             return;
         }
         new Thread() {
@@ -258,7 +287,7 @@ public class TCPConnected {
      * @return 返回照片的base64编码
      */
     public static String fetch_camera() {
-        if (socket != null) {
+        if (remote != null) {
             try {
                 // 因为照片的base64编码格式的数据较多，服务端会一段一段的发送数据片段，不能够一下拿到整条数据
                 // 数据中包含一段json格式的数据，所以可以用{}来作为整条数据的判定

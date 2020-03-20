@@ -23,7 +23,6 @@ import java.net.Socket;
 
 @SuppressLint("HandlerLeak")
 public class CameraSettingActivity extends BaseActivity implements View.OnClickListener {
-
     private ImageView iv_logo;
     private EditText et_ip;
     private EditText et_port;
@@ -124,13 +123,15 @@ public class CameraSettingActivity extends BaseActivity implements View.OnClickL
         }
         int portInt = Integer.parseInt(portStr);
 
+        App.showToast("正在连接");
+
         // 判断进入当前界面后最新输入的ip或端口号是否和之前的一样，如果不一样则断开之前的连接
         // 对摄像头连接的socket进行判空
         if (!(ip.equals(camera_ip) && portInt == camera_port) || cameraSocket == null) {
             // 停止之前的连接
             cameraSocket = null;
             TCPConnected.stop();
-            TCPConnected.start(ip, portInt, new TCPConnected.ResultData() {
+            TCPConnected.start(ip, portInt, 1, new TCPConnected.ResultData() {
                 @Override
                 public void isConnected(Socket socket, Message message) {
                     if (socket.isConnected()) {
@@ -141,6 +142,7 @@ public class CameraSettingActivity extends BaseActivity implements View.OnClickL
                         SpUtil.putInt("camera_port", camera_port);
 
                         cameraSocket = socket;
+
                         message.what = 0;
                         message.obj = socket;
                         handler.sendMessage(message);

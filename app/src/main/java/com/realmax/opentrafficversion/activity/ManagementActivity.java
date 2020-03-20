@@ -1,5 +1,6 @@
 package com.realmax.opentrafficversion.activity;
 
+import android.annotation.SuppressLint;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridView;
@@ -43,9 +44,12 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
 
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void initData() {
-
+        // 判断连接状态
+        tv_camera_state.setText("摄像头：" + (cameraSocket != null ? "已连接" : "未连接"));
+        tv_control_state.setText("控制器：" + (remoteSocket != null ? "已连接" : "未连接"));
     }
 
     @Override

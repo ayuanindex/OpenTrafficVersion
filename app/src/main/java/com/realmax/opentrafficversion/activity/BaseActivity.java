@@ -23,8 +23,8 @@ import io.reactivex.schedulers.Schedulers;
 
 public abstract class BaseActivity extends AppCompatActivity {
     public final String TAG = this.getClass().getSimpleName();
-    public Socket remoteSocket = null;
-    public Socket cameraSocket = null;
+    public static Socket remoteSocket = null;
+    public static Socket cameraSocket = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
