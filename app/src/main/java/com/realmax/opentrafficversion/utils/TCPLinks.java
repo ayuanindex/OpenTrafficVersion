@@ -63,7 +63,6 @@ public class TCPLinks {
                 try {
                     // 建立TCP连接
                     socket = new Socket(host, port);
-                    socket.setSoTimeout(1000);
                     socket.setKeepAlive(true);
                     // 获取输入里：获取数据
                     inputStream = socket.getInputStream();
@@ -135,6 +134,7 @@ public class TCPLinks {
                 try {
                     // 停止上一次的拍照
                     stop_camera();
+                    sleep(1000);
                     // 准备好的拍照指令
                     String command = "{\"cmd\": \"start\", \"deviceType\": \"" + device_type + "\", \"deviceId\": " + device_id + ", \"cameraNum\": " + camera_num + "}";
                     // 通过EncodeAndDecode工具累中的getStrUnicode方法将需要传输的数据进行Unicode编码
@@ -143,7 +143,7 @@ public class TCPLinks {
                     // 将加工好的数据发送至服务端
                     outputStream.write(combine);
                     outputStream.flush();
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
@@ -322,7 +322,8 @@ public class TCPLinks {
                         return getResult(string);
                     }
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
         return "";

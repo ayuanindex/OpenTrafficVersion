@@ -3,7 +3,9 @@ package com.realmax.opentrafficversion.activity;
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.os.Build;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.TextureView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridView;
@@ -65,6 +67,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
         cameraTCPLink = new TCPLinks(cameraSocket);
         remoteTCPLink = new TCPLinks(remoteSocket);
 
+        cameraTCPLink.start_camera("小车", 1, 1);
         getImage();
     }
 
@@ -78,14 +81,16 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                 if (cameraSocket != null) {
                     while (!flag) {
                         String s = cameraTCPLink.fetch_camera();
-                        Log.i(TAG, "run: 哈哈和：" + s);
-                        Bitmap bitmap = EncodeAndDecode.decodeBase64ToImage(s);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                iv_snap_shot.setImageBitmap(bitmap);
-                            }
-                        });
+                        if (!TextUtils.isEmpty(s)) {
+                            Log.i(TAG, "run: 哈哈和：" + s);
+                            Bitmap bitmap = EncodeAndDecode.decodeBase64ToImage(s);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    iv_snap_shot.setImageBitmap(bitmap);
+                                }
+                            });
+                        }
                     }
                 }
             }
@@ -110,5 +115,6 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
     protected void onDestroy() {
         super.onDestroy();
         flag = true;
+        cameraTCPLink.stop_camera();
     }
 }
