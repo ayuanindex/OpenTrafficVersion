@@ -42,18 +42,9 @@
         android:text="进入交通管理"
         app:layout_constraintBottom_toTopOf="@+id/btn_jump_camera_setting"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/btn_jump_control_setting"
-        android:layout_width="169dp"
-        android:layout_height="41dp"
-        android:layout_marginBottom="28dp"
-        android:background="#ffffff"
-        android:text="控制器奢姿"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView2"
+        app:layout_constraintVertical_bias="1.0" />
 
     <Button
         android:id="@+id/btn_jump_camera_setting"
@@ -63,6 +54,17 @@
         android:background="#ffffff"
         android:text="摄像头设置"
         app:layout_constraintBottom_toTopOf="@+id/btn_jump_control_setting"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/btn_jump_control_setting"
+        android:layout_width="169dp"
+        android:layout_height="41dp"
+        android:layout_marginBottom="28dp"
+        android:background="#ffffff"
+        android:text="控制器设置"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
