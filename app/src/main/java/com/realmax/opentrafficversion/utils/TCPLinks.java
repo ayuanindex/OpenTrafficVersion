@@ -155,6 +155,11 @@ public class TCPLinks {
      * 停止拍照
      */
     public void stop_camera() {
+        // 对socket进行判空处理　
+        if (socket == null) {
+            return;
+        }
+
         new Thread() {
             @Override
             public void run() {
