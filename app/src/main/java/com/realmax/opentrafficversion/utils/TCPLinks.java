@@ -294,7 +294,7 @@ public class TCPLinks {
      *
      * @return 返回照片的base64编码
      */
-    public String fetch_camera() {
+    public String getJsonString() {
         if (socket != null) {
             try {
                 // 因为照片的base64编码格式的数据较多，服务端会一段一段的发送数据片段，不能够一下拿到整条数据
@@ -323,13 +323,13 @@ public class TCPLinks {
                         // flag设置为false停止记录
                         flag = false;
                         // 将StringBuilder记录的整段的字符串提取出来
-                        String jsonStr = result.toString();
-                        // 初始化StringBuilder
+                        /*// 初始化StringBuilder
                         result = new StringBuilder("");
                         CameraBodyBean cameraBodyBean = new Gson().fromJson(jsonStr, CameraBodyBean.class);
                         String cameraImg = cameraBodyBean.getCameraImg();
                         // 这里就直接截取了字符串，直接获取图片的信息
-                        return cameraImg.equals("") ? "" : cameraImg;
+                        return cameraImg.equals("") ? "" : cameraImg;*/
+                        return result.toString();
                     }
                 }
             } catch (Exception e) {
@@ -338,6 +338,22 @@ public class TCPLinks {
             }
         }
         return "";
+    }
+
+    /**
+     * 获取图片信息数据
+     *
+     * @param data 获取到的json数据
+     * @return 返回base64编码的图片数据
+     */
+    public String getImageData(String data) {
+        if (data.equals("")) {
+            return "";
+        }
+        CameraBodyBean cameraBodyBean = new Gson().fromJson(data, CameraBodyBean.class);
+        String cameraImg = cameraBodyBean.getCameraImg();
+        // 这里就直接截取了字符串，直接获取图片的信息
+        return cameraImg.equals("") ? "" : cameraImg;
     }
 
     /**

@@ -105,10 +105,10 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                 super.run();
                 if (cameraSocket != null) {
                     while (!flag) {
-                        String s = cameraTCPLink.fetch_camera();
-                        if (!TextUtils.isEmpty(s)) {
-                            Log.i(TAG, "run: 哈哈和：" + s);
-                            Bitmap bitmap = EncodeAndDecode.decodeBase64ToImage(s);
+                        String imageData = cameraTCPLink.getImageData(cameraTCPLink.getJsonString());
+                        if (!TextUtils.isEmpty(imageData)) {
+                            Log.i(TAG, "run: 哈哈和：" + imageData);
+                            Bitmap bitmap = EncodeAndDecode.decodeBase64ToImage(imageData);
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
