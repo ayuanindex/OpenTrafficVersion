@@ -1,5 +1,6 @@
 package com.realmax.opentrafficversion;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
 import android.app.ProgressDialog;
@@ -18,12 +19,13 @@ public class App extends Application {
     private static ApiService remote;
     private static Toast toast;
 
+    @SuppressLint("ShowToast")
     @Override
     public void onCreate() {
         super.onCreate();
         gson = new Gson();
         context = this;
-        toast = Toast.makeText(this, "", Toast.LENGTH_SHORT);
+        toast = Toast.makeText(context, "", Toast.LENGTH_SHORT);
         remote = Network.remote(ApiService.class);
     }
 
@@ -36,7 +38,8 @@ public class App extends Application {
     }
 
     public static void showToast(String msg) {
-        toast.setText(msg);
+        toast.cancel();
+        toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT);
         toast.show();
     }
 

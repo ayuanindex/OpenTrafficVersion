@@ -61,6 +61,8 @@ public abstract class BaseActivity extends AppCompatActivity {
         if ("".equals(Values.TOKEN)) {
             getTokenString();
         }
+
+
     }
 
     /**

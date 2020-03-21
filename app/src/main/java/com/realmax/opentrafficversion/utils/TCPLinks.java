@@ -329,6 +329,7 @@ public class TCPLinks {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+                return "";
             }
         }
         return "";
