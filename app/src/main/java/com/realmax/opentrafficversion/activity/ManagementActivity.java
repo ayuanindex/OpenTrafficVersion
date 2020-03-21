@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -30,12 +29,30 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
     private TextView tv_measure;
     private TextView tv_tips;
     private Button btn_back;
-    private TCPLinks cameraTCPLink;
-    private TCPLinks remoteTCPLink;
-    private boolean flag = false;
-    private ArrayList<String> buttonNames;
-    private CustomerAdapter customerAdapter;
+    /**
+     * 摄像头切换按钮
+     */
     private GridView gv_btns;
+    /**
+     * 小车摄像头的链接
+     */
+    private TCPLinks cameraTCPLink;
+    /**
+     * 红绿灯摄像头的链接
+     */
+    private TCPLinks remoteTCPLink;
+    /**
+     * 是否获取小车摄像头数据的标识符
+     */
+    private boolean cameraFlag = false;
+    /**
+     * 按钮名称的集合
+     */
+    private ArrayList<String> buttonNames;
+    /**
+     * 继承了BaseAdapter的数据适配器
+     */
+    private CustomerAdapter customerAdapter;
 
     @Override
     protected int getLayoutId() {
@@ -89,22 +106,30 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
         cameraTCPLink = new TCPLinks(cameraSocket);
         remoteTCPLink = new TCPLinks(remoteSocket);
 
+        // 获取违章数据
+        violate();
         // 获取摄像头拍摄数据
-        getImage();
+        getImageData();
+    }
+
+    /**
+     * 获取违章拍摄的摄像头
+     */
+    private void violate() {
+
     }
 
     /**
      * 获取摄像头图片
      */
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private void getImage() {
+    private void getImageData() {
         new Thread() {
-            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void run() {
                 super.run();
                 if (cameraSocket != null) {
-                    while (!flag) {
+                    while (!cameraFlag) {
                         String imageData = cameraTCPLink.getImageData(cameraTCPLink.fetch_camera());
                         if (!TextUtils.isEmpty(imageData)) {
                             Bitmap bitmap = EncodeAndDecode.decodeBase64ToImage(imageData);
@@ -169,7 +194,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                     // 选中item的position
                     checkedPosition = position;
                     // 刷新列表更新当前按钮状态
-                    notifyDataSetChanged();
+                    customerAdapter.notifyDataSetChanged();
                     App.showToast("点击了：" + getItem(position) + "按钮");
                 }
             });
@@ -194,7 +219,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        flag = true;
+        cameraFlag = true;
         cameraTCPLink.stop_camera();
     }
 }

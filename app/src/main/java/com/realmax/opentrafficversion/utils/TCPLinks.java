@@ -8,9 +8,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.realmax.opentrafficversion.bean.CameraBodyBean;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -23,9 +20,12 @@ import java.net.Socket;
  * @CreateDate: 2020/3/16 09:32
  */
 public class TCPLinks {
-    private final String TAG = "TCPConnected";
-    private StringBuilder result = new StringBuilder("");
+    private static final String TAG = "TCPLinks";
+    private StringBuffer result = new StringBuffer();
     private Socket socket = null;
+    /**
+     * 是否继续拼接字符串的标识
+     */
     private boolean flag = false;
     /**
      * 输入流：读取数据
@@ -54,6 +54,24 @@ public class TCPLinks {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    // 回调接口，后期可拓展
+    public interface ResultData {
+        /**
+         * 连接成功的回调方法
+         *
+         * @param socket
+         * @param message
+         */
+        void isConnected(Socket socket, Message message);
+
+        /**
+         * 连接失败的回调
+         *
+         * @param message
+         */
+        void error(Message message);
     }
 
     /**
@@ -85,43 +103,6 @@ public class TCPLinks {
                 }
             }
         }.start();
-    }
-
-    /**
-     * 关闭TCP连接
-     */
-    public void stop() {
-        try {
-            // 关闭连接
-            if (socket != null) {
-                socket.close();
-                socket = null;
-            }
-
-            // 关闭输出流
-            if (inputStream != null) {
-                inputStream.close();
-            }
-
-            // 关闭输入流
-            if (outputStream != null) {
-                outputStream.close();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void stop(Socket socket) {
-        // 关闭连接
-        try {
-            if (socket != null) {
-                socket.close();
-                socket = null;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -297,8 +278,9 @@ public class TCPLinks {
 
     /**
      * 获取服务端返回的数据
+     * 数据中包含json字符串和其他字符串
      *
-     * @return 返回照片的base64编码
+     * @return 提取出json字符串
      */
     public String fetch_camera() {
         if (socket != null) {
@@ -331,9 +313,9 @@ public class TCPLinks {
                         // 将StringBuilder记录的整段的字符串提取出来
                         String jsonStr = result.toString();
                         // 初始化StringBuilder
-                        result = new StringBuilder("");
+                        result = new StringBuffer();
                         // 这里就直接截取了字符串，直接获取图片的信息
-                        return EncodeAndDecode.getStrUnicode(jsonStr);
+                        return jsonStr;
                     }
                 }
             } catch (Exception e) {
@@ -344,12 +326,18 @@ public class TCPLinks {
         return "";
     }
 
+    /**
+     * 解析获取到的json字符串，并将图片的数据提取出来
+     *
+     * @param imageData 服务端返回的json数据
+     * @return 图片的base64编码
+     */
     public String getImageData(String imageData) {
         if (TextUtils.isEmpty(imageData)) {
             return "";
         }
+
         try {
-            /*Log.i(TAG, "getImageData: " + jsonObject.optString("cameraImg", ""));*/
             CameraBodyBean cameraBodyBean = new Gson().fromJson(imageData, CameraBodyBean.class);
             String cameraImg = cameraBodyBean.getCameraImg();
             return cameraImg.equals("") ? "" : cameraImg;
@@ -369,26 +357,45 @@ public class TCPLinks {
      * @param data 需要截取
      * @return 返回json对象
      */
-    public String getResult(String data) {
+    /*public String getResult(String data) {
         // 前72为都是其他信息的数据，后面少截2为是一个双引号加上一个大括号
         return data.substring(72, data.length() - 2);
+    }*/
+
+    /**
+     * 关闭TCP连接
+     */
+    public void stop() {
+        try {
+            // 关闭连接
+            if (socket != null) {
+                socket.close();
+                socket = null;
+            }
+
+            // 关闭输出流
+            if (inputStream != null) {
+                inputStream.close();
+            }
+
+            // 关闭输入流
+            if (outputStream != null) {
+                outputStream.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    // 回调接口，后期可拓展
-    public interface ResultData {
-        /**
-         * 连接成功的回调方法
-         *
-         * @param socket
-         * @param message
-         */
-        void isConnected(Socket socket, Message message);
-
-        /**
-         * 连接失败的回调
-         *
-         * @param message
-         */
-        void error(Message message);
+    public static void stop(Socket socket) {
+        // 关闭连接
+        try {
+            if (socket != null) {
+                socket.close();
+                socket = null;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

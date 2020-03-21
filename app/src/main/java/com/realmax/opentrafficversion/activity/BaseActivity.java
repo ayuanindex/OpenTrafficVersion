@@ -2,10 +2,8 @@ package com.realmax.opentrafficversion.activity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.LayoutRes;
@@ -16,8 +14,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.realmax.opentrafficversion.App;
 import com.realmax.opentrafficversion.Values;
 import com.realmax.opentrafficversion.bean.TokenBean;
-import com.realmax.opentrafficversion.utils.EncodeAndDecode;
-import com.realmax.opentrafficversion.utils.TCPLinks;
 
 import java.net.Socket;
 
@@ -66,10 +62,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         if ("".equals(Values.TOKEN)) {
             getTokenString();
         }
-    }
-
-    public String getImageData(String imageData) {
-        return imageData;
     }
 
     /**
