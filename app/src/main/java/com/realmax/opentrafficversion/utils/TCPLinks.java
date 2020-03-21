@@ -330,7 +330,9 @@ public class TCPLinks {
                         String cameraImg = cameraBodyBean.getCameraImg();
                         // 这里就直接截取了字符串，直接获取图片的信息
                         return cameraImg.equals("") ? "" : cameraImg;*/
-                        return result.toString();
+                        String data = result.toString();
+                        result = new StringBuilder("");
+                        return EncodeAndDecode.getStrUnicode(data);
                     }
                 }
             } catch (Exception e) {
