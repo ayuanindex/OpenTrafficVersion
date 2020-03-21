@@ -2,8 +2,10 @@ package com.realmax.opentrafficversion.activity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.LayoutRes;
@@ -14,6 +16,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.realmax.opentrafficversion.App;
 import com.realmax.opentrafficversion.Values;
 import com.realmax.opentrafficversion.bean.TokenBean;
+import com.realmax.opentrafficversion.utils.EncodeAndDecode;
+import com.realmax.opentrafficversion.utils.TCPLinks;
 
 import java.net.Socket;
 
@@ -25,6 +29,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     public final String TAG = this.getClass().getSimpleName();
     public static Socket remoteSocket = null;
     public static Socket cameraSocket = null;
+    private boolean cameraFlag = true;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,8 +66,36 @@ public abstract class BaseActivity extends AppCompatActivity {
         if ("".equals(Values.TOKEN)) {
             getTokenString();
         }
+        new Thread() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void run() {
+                super.run();
+                if (cameraSocket != null) {
+                    TCPLinks cameraTCPLink = new TCPLinks(cameraSocket);
+                    while (cameraFlag) {
+                        String imageData = cameraTCPLink.getImageData(cameraTCPLink.getJsonString());
+                        if (!TextUtils.isEmpty(imageData)) {
+                            Log.i(TAG, "run: 哈哈和：" + imageData);
+                            Bitmap bitmap = EncodeAndDecode.decodeBase64ToImage(imageData);
+                            getImageData(imageData);
+                            /*runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    iv_snap_shot.setImageBitmap(bitmap);
+                                }
+                            });*/
+                        }
+                    }
+                }
+            }
+        }.start();
 
 
+    }
+
+    public String getImageData(String imageData) {
+        return imageData;
     }
 
     /**

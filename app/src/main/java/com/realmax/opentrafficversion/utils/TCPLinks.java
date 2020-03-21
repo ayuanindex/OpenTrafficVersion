@@ -3,6 +3,7 @@ package com.realmax.opentrafficversion.utils;
 import android.os.Message;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.realmax.opentrafficversion.bean.CameraBodyBean;
 
 import java.io.IOException;
@@ -347,14 +348,20 @@ public class TCPLinks {
      * @return 返回base64编码的图片数据
      */
     public String getImageData(String data) {
-        if (data.equals("")) {
+        try {
+            if (data.equals("")) {
+                return "";
+            }
+            CameraBodyBean cameraBodyBean = new Gson().fromJson(data, CameraBodyBean.class);
+            String cameraImg = cameraBodyBean.getCameraImg();
+            // 这里就直接截取了字符串，直接获取图片的信息
+            return cameraImg.equals("") ? "" : cameraImg;
+        } catch (JsonSyntaxException e) {
+            e.printStackTrace();
             return "";
         }
-        CameraBodyBean cameraBodyBean = new Gson().fromJson(data, CameraBodyBean.class);
-        String cameraImg = cameraBodyBean.getCameraImg();
-        // 这里就直接截取了字符串，直接获取图片的信息
-        return cameraImg.equals("") ? "" : cameraImg;
     }
+
 
     /**
      * 将返回的数据提取出来

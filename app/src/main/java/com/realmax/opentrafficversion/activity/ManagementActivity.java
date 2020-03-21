@@ -35,7 +35,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
     private Button btn_back;
     private TCPLinks cameraTCPLink;
     private TCPLinks remoteTCPLink;
-    private boolean flag = false;
+    private boolean flag = true;
     private ArrayList<String> buttonNames;
     private CustomerAdapter customerAdapter;
     private GridView gv_btns;
@@ -102,6 +102,12 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
         getImage();
     }
 
+    @Override
+    public String getImageData(String imageData) {
+        Log.i(TAG, "getImageData: " + imageData);
+        return super.getImageData(imageData);
+    }
+
     /**
      * 获取摄像头图片
      */
@@ -113,7 +119,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
             public void run() {
                 super.run();
                 if (cameraSocket != null) {
-                    while (!flag) {
+                    while (flag) {
                         String imageData = cameraTCPLink.getImageData(cameraTCPLink.getJsonString());
                         if (!TextUtils.isEmpty(imageData)) {
                             Log.i(TAG, "run: 哈哈和：" + imageData);
@@ -204,7 +210,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        flag = true;
+        flag = false;
         cameraTCPLink.stop_camera();
     }
 }
