@@ -2,6 +2,9 @@ package com.realmax.opentrafficversion.utils;
 
 import android.os.Message;
 
+import com.google.gson.Gson;
+import com.realmax.opentrafficversion.bean.CameraBodyBean;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -320,11 +323,13 @@ public class TCPLinks {
                         // flag设置为false停止记录
                         flag = false;
                         // 将StringBuilder记录的整段的字符串提取出来
-                        String string = result.toString();
+                        String jsonStr = result.toString();
                         // 初始化StringBuilder
                         result = new StringBuilder("");
+                        CameraBodyBean cameraBodyBean = new Gson().fromJson(jsonStr, CameraBodyBean.class);
+                        String cameraImg = cameraBodyBean.getCameraImg();
                         // 这里就直接截取了字符串，直接获取图片的信息
-                        return getResult(string);
+                        return cameraImg.equals("") ? "" : cameraImg;
                     }
                 }
             } catch (Exception e) {

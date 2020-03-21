@@ -160,7 +160,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                 // 将选中的按钮的状态更改为true
                 cbCamera.setChecked(true);
                 // 开启监控
-                cameraTCPLink.start_camera("监控", position, position);
+                cameraTCPLink.start_camera("小车", position + 1, position);
             }
 
             cbCamera.setOnClickListener(null);

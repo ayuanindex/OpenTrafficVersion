@@ -6,7 +6,7 @@ package com.realmax.opentrafficversion.bean;
  * @ClassName: BodyBean
  * @CreateDate: 2020/3/16 13:14
  */
-public class BodyBean {
+public class CameraBodyBean {
 
     /**
      * cmd : play
