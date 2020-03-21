@@ -66,32 +66,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         if ("".equals(Values.TOKEN)) {
             getTokenString();
         }
-        new Thread() {
-            @RequiresApi(api = Build.VERSION_CODES.O)
-            @Override
-            public void run() {
-                super.run();
-                if (cameraSocket != null) {
-                    TCPLinks cameraTCPLink = new TCPLinks(cameraSocket);
-                    while (cameraFlag) {
-                        String imageData = cameraTCPLink.getImageData(cameraTCPLink.getJsonString());
-                        if (!TextUtils.isEmpty(imageData)) {
-                            Log.i(TAG, "run: 哈哈和：" + imageData);
-                            Bitmap bitmap = EncodeAndDecode.decodeBase64ToImage(imageData);
-                            getImageData(imageData);
-                            /*runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    iv_snap_shot.setImageBitmap(bitmap);
-                                }
-                            });*/
-                        }
-                    }
-                }
-            }
-        }.start();
-
-
     }
 
     public String getImageData(String imageData) {

@@ -18,10 +18,7 @@ import androidx.annotation.RequiresApi;
 
 import com.realmax.opentrafficversion.App;
 import com.realmax.opentrafficversion.R;
-import com.realmax.opentrafficversion.Values;
-import com.realmax.opentrafficversion.bean.ORCBean;
 import com.realmax.opentrafficversion.utils.EncodeAndDecode;
-import com.realmax.opentrafficversion.utils.Network;
 import com.realmax.opentrafficversion.utils.TCPLinks;
 
 import java.util.ArrayList;
@@ -35,7 +32,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
     private Button btn_back;
     private TCPLinks cameraTCPLink;
     private TCPLinks remoteTCPLink;
-    private boolean flag = true;
+    private boolean flag = false;
     private ArrayList<String> buttonNames;
     private CustomerAdapter customerAdapter;
     private GridView gv_btns;
@@ -91,21 +88,9 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
 
         cameraTCPLink = new TCPLinks(cameraSocket);
         remoteTCPLink = new TCPLinks(remoteSocket);
-        Network.getORCString(iv_snap_shot.getDrawable(), Values.LICENSE_PLATE_ORC_URL, ORCBean.class, new Network.ResultData<ORCBean>() {
-            @Override
-            public void result(ORCBean orcBean) {
-                Log.i(TAG, "result: " + orcBean.toString());
-            }
-        });
 
         // 获取摄像头拍摄数据
         getImage();
-    }
-
-    @Override
-    public String getImageData(String imageData) {
-        Log.i(TAG, "getImageData: " + imageData);
-        return super.getImageData(imageData);
     }
 
     /**
@@ -119,10 +104,9 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
             public void run() {
                 super.run();
                 if (cameraSocket != null) {
-                    while (flag) {
-                        String imageData = cameraTCPLink.getImageData(cameraTCPLink.getJsonString());
+                    while (!flag) {
+                        String imageData = cameraTCPLink.getImageData(cameraTCPLink.fetch_camera());
                         if (!TextUtils.isEmpty(imageData)) {
-                            Log.i(TAG, "run: 哈哈和：" + imageData);
                             Bitmap bitmap = EncodeAndDecode.decodeBase64ToImage(imageData);
                             runOnUiThread(new Runnable() {
                                 @Override
@@ -210,7 +194,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        flag = false;
+        flag = true;
         cameraTCPLink.stop_camera();
     }
 }

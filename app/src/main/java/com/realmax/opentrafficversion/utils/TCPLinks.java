@@ -1,10 +1,15 @@
 package com.realmax.opentrafficversion.utils;
 
 import android.os.Message;
+import android.text.TextUtils;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.realmax.opentrafficversion.bean.CameraBodyBean;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,7 +24,7 @@ import java.net.Socket;
  */
 public class TCPLinks {
     private final String TAG = "TCPConnected";
-    private StringBuffer result = new StringBuffer();
+    private StringBuilder result = new StringBuilder("");
     private Socket socket = null;
     private boolean flag = false;
     /**
@@ -137,8 +142,8 @@ public class TCPLinks {
                 super.run();
                 try {
                     // 停止上一次的拍照
-                    stop_camera();
-                    sleep(1000);
+                    /*stop_camera();aw
+                    sleep(1000);*/
                     // 准备好的拍照指令
                     String command = "{\"cmd\": \"start\", \"deviceType\": \"" + device_type + "\", \"deviceId\": " + device_id + ", \"cameraNum\": " + camera_num + "}";
                     // 通过EncodeAndDecode工具累中的getStrUnicode方法将需要传输的数据进行Unicode编码
@@ -295,7 +300,7 @@ public class TCPLinks {
      *
      * @return 返回照片的base64编码
      */
-    public String getJsonString() {
+    public String fetch_camera() {
         if (socket != null) {
             try {
                 // 因为照片的base64编码格式的数据较多，服务端会一段一段的发送数据片段，不能够一下拿到整条数据
@@ -305,7 +310,7 @@ public class TCPLinks {
                 // 结束拼接数据的标记
                 char right = '}';
                 // 读取一段数据
-                byte[] bytes = new byte[1024];
+                byte[] bytes = new byte[2048];
                 int read = inputStream.read(bytes);
                 String s = new String(bytes, 0, read);
                 // 将数据进行遍历
@@ -324,15 +329,11 @@ public class TCPLinks {
                         // flag设置为false停止记录
                         flag = false;
                         // 将StringBuilder记录的整段的字符串提取出来
-                        /*// 初始化StringBuilder
+                        String jsonStr = result.toString();
+                        // 初始化StringBuilder
                         result = new StringBuilder("");
-                        CameraBodyBean cameraBodyBean = new Gson().fromJson(jsonStr, CameraBodyBean.class);
-                        String cameraImg = cameraBodyBean.getCameraImg();
                         // 这里就直接截取了字符串，直接获取图片的信息
-                        return cameraImg.equals("") ? "" : cameraImg;*/
-                        String data = result.toString();
-                        result = new StringBuffer();
-                        return EncodeAndDecode.getStrUnicode(data);
+                        return EncodeAndDecode.getStrUnicode(jsonStr);
                     }
                 }
             } catch (Exception e) {
@@ -343,27 +344,24 @@ public class TCPLinks {
         return "";
     }
 
-    /**
-     * 获取图片信息数据
-     *
-     * @param data 获取到的json数据
-     * @return 返回base64编码的图片数据
-     */
-    public String getImageData(String data) {
+    public String getImageData(String imageData) {
+        if (TextUtils.isEmpty(imageData)) {
+            return "";
+        }
         try {
-            if (data.equals("")) {
-                return "";
-            }
-            CameraBodyBean cameraBodyBean = new Gson().fromJson(data, CameraBodyBean.class);
+            /*Log.i(TAG, "getImageData: " + jsonObject.optString("cameraImg", ""));*/
+            CameraBodyBean cameraBodyBean = new Gson().fromJson(imageData, CameraBodyBean.class);
             String cameraImg = cameraBodyBean.getCameraImg();
-            // 这里就直接截取了字符串，直接获取图片的信息
             return cameraImg.equals("") ? "" : cameraImg;
         } catch (JsonSyntaxException e) {
             e.printStackTrace();
-            return "";
+            // 出现json解析异常，处理特定异常{����{"cmd":"play","deviceType":"\u5c0f\u8f66","deviceId":1,"cameraNum":1}
+            String substring = imageData.substring(1);
+            Log.i(TAG, "getImageData: 出现异常：" + substring);
+            getImageData(substring);
         }
+        return "";
     }
-
 
     /**
      * 将返回的数据提取出来
