@@ -39,6 +39,7 @@ public class App extends Application {
 
     public static void showToast(String msg) {
         toast.cancel();
+        toast = null;
         toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT);
         toast.show();
     }

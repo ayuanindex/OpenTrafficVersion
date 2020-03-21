@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -88,12 +89,13 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
         cameraTCPLink = new TCPLinks(cameraSocket);
         remoteTCPLink = new TCPLinks(remoteSocket);
 
-        cameraTCPLink.start_camera("小车", 1, 1);
+        // 获取摄像头拍摄数据
         getImage();
-
-        gv_btns.setSelection(2);
     }
 
+    /**
+     * 获取摄像头图片
+     */
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void getImage() {
         new Thread() {
@@ -121,7 +123,8 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
     }
 
     class CustomerAdapter extends BaseAdapter {
-        private Button btnCamera;
+        private CheckBox cbCamera;
+        private int checkedPosition = 0;
 
         @Override
         public int getCount() {
@@ -147,12 +150,27 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                 view = convertView;
             }
             initView(view);
-            btnCamera.setText(getItem(position));
+            // 设置按钮显示的文字
+            cbCamera.setText(getItem(position));
+            // 设置按钮的默认选中状态
+            cbCamera.setChecked(false);
 
-            btnCamera.setOnClickListener(null);
-            btnCamera.setOnClickListener(new View.OnClickListener() {
+            // 设置当前选中的按钮
+            if (checkedPosition == position) {
+                // 将选中的按钮的状态更改为true
+                cbCamera.setChecked(true);
+                // 开启监控
+                cameraTCPLink.start_camera("监控", position, position);
+            }
+
+            cbCamera.setOnClickListener(null);
+            cbCamera.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    // 选中item的position
+                    checkedPosition = position;
+                    // 刷新列表更新当前按钮状态
+                    notifyDataSetChanged();
                     App.showToast("点击了：" + getItem(position) + "按钮");
                 }
             });
@@ -160,7 +178,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
         }
 
         private void initView(View view) {
-            btnCamera = (Button) view.findViewById(R.id.btn_camera);
+            cbCamera = (CheckBox) view.findViewById(R.id.cb_camera);
         }
     }
 
