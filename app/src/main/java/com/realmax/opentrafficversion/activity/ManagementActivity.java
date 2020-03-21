@@ -18,7 +18,10 @@ import androidx.annotation.RequiresApi;
 
 import com.realmax.opentrafficversion.App;
 import com.realmax.opentrafficversion.R;
+import com.realmax.opentrafficversion.Values;
+import com.realmax.opentrafficversion.bean.ORCBean;
 import com.realmax.opentrafficversion.utils.EncodeAndDecode;
+import com.realmax.opentrafficversion.utils.Network;
 import com.realmax.opentrafficversion.utils.TCPLinks;
 
 import java.util.ArrayList;
@@ -88,6 +91,12 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
 
         cameraTCPLink = new TCPLinks(cameraSocket);
         remoteTCPLink = new TCPLinks(remoteSocket);
+        Network.getORCString(iv_snap_shot.getDrawable(), Values.LICENSE_PLATE_ORC_URL, ORCBean.class, new Network.ResultData<ORCBean>() {
+            @Override
+            public void result(ORCBean orcBean) {
+                Log.i(TAG, "result: " + orcBean.toString());
+            }
+        });
 
         // 获取摄像头拍摄数据
         getImage();

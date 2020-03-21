@@ -69,17 +69,24 @@ public class Network {
      */
     @RequiresApi(api = Build.VERSION_CODES.O)
     public static <T> void getORCString(Drawable drawable, String URL, Class<T> tClass, ResultData<? super T> resultData) {
-        try {
-            Bitmap bitmap = EncodeAndDecode.drawableToBitmap(drawable);
-            String bitmapToBase64 = bitmapToBase64(bitmap);
-            String imgParam = URLEncoder.encode(bitmapToBase64, "UTF-8");
-            String param = "image=" + imgParam;
-            // 注意这里仅为了简化编码每一次请求都去获取access_token，线上环境access_token有过期时间， 客户端可自行缓存，过期后重新获取。
-            String result = HttpUtil.post(URL, Values.TOKEN, param);
-            Log.i(TAG, "拿到了识别文字：" + result);
-            resultData.result(new Gson().fromJson(result, tClass));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        new Thread() {
+            @Override
+            public void run() {
+                super.run();
+                try {
+                    Bitmap bitmap = EncodeAndDecode.drawableToBitmap(drawable);
+                    String bitmapToBase64 = bitmapToBase64(bitmap);
+                    String imgParam = URLEncoder.encode(bitmapToBase64, "UTF-8");
+                    String param = "image=" + imgParam;
+                    // 注意这里仅为了简化编码每一次请求都去获取access_token，线上环境access_token有过期时间， 客户端可自行缓存，过期后重新获取。
+                    String result = HttpUtil.post(URL, Values.TOKEN, param);
+                    Log.i(TAG, "拿到了识别文字：" + result);
+                    resultData.result(new Gson().fromJson(result, tClass));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }.start();
     }
 }
