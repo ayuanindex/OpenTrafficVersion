@@ -19,7 +19,7 @@ import java.net.Socket;
  */
 public class TCPLinks {
     private final String TAG = "TCPConnected";
-    private StringBuilder result = new StringBuilder("");
+    private StringBuffer result = new StringBuffer();
     private Socket socket = null;
     private boolean flag = false;
     /**
@@ -331,7 +331,7 @@ public class TCPLinks {
                         // 这里就直接截取了字符串，直接获取图片的信息
                         return cameraImg.equals("") ? "" : cameraImg;*/
                         String data = result.toString();
-                        result = new StringBuilder("");
+                        result = new StringBuffer();
                         return EncodeAndDecode.getStrUnicode(data);
                     }
                 }
