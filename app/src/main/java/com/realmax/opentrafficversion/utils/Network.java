@@ -11,6 +11,8 @@ import com.google.gson.Gson;
 import com.realmax.opentrafficversion.App;
 import com.realmax.opentrafficversion.Values;
 
+import org.json.JSONObject;
+
 import java.net.URLEncoder;
 import java.util.concurrent.TimeUnit;
 
@@ -81,7 +83,12 @@ public class Network {
                     // 注意这里仅为了简化编码每一次请求都去获取access_token，线上环境access_token有过期时间， 客户端可自行缓存，过期后重新获取。
                     String result = HttpUtil.post(URL, Values.TOKEN, param);
                     Log.i(TAG, "拿到了识别文字：" + result);
-                    resultData.result(new Gson().fromJson(result, tClass));
+                    JSONObject jsonObject = new JSONObject(result);
+                    if (jsonObject.has("error_code")) {
+                        resultData.result(null);
+                    } else {
+                        resultData.result(new Gson().fromJson(result, tClass));
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

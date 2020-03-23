@@ -2,8 +2,12 @@ package com.realmax.opentrafficversion.activity;
 
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Message;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -13,14 +17,17 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
+import com.realmax.opentrafficversion.App;
 import com.realmax.opentrafficversion.R;
+import com.realmax.opentrafficversion.Values;
+import com.realmax.opentrafficversion.bean.ORCBean;
+import com.realmax.opentrafficversion.bean.ViolateBean;
 import com.realmax.opentrafficversion.utils.EncodeAndDecode;
+import com.realmax.opentrafficversion.utils.Network;
 import com.realmax.opentrafficversion.utils.TCPLinks;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -32,10 +39,27 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
     private TextView tv_measure;
     private TextView tv_tips;
     private Button btn_back;
+
+    /**
+     * 是否开始拍照
+     */
+    private boolean isBeat = false;
+
+    /**
+     * 抓拍次数
+     */
+    private int count = 0;
+
+    /**
+     * 当前识别到的车牌号
+     */
+    private String currentNumberPlate;
+
     /**
      * 摄像头切换按钮
      */
     private GridView gv_btns;
+
     /**
      * 小车摄像头的链接
      */
@@ -57,6 +81,21 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
      */
     private CustomerAdapter customerAdapter;
     private int checkedPosition = 0;
+    private ArrayList<ViolateBean> violateBeans;
+
+    @SuppressLint("HandlerLeak")
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case 0:
+                    String message = (String) msg.obj;
+                    App.showToast(message);
+                    break;
+            }
+        }
+    };
 
     @Override
     protected int getLayoutId() {
@@ -107,13 +146,16 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
         customerAdapter = new CustomerAdapter();
         gv_btns.setAdapter(customerAdapter);
 
+        // 初始化违章车辆集合
+        violateBeans = new ArrayList<>();
+
         cameraTCPLink = new TCPLinks(cameraSocket);
         remoteTCPLink = new TCPLinks(remoteSocket);
 
-        // 获取违章数据
-        violate();
         // 获取摄像头拍摄数据
         getImageData();
+        // 获取违章数据
+        violate();
     }
 
     /**
@@ -127,25 +169,25 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                 try {
                     if (remoteSocket != null) {
                         while (flag) {
-                            String json = remoteTCPLink.getJson();
-                            if (!TextUtils.isEmpty(json)) {
-                                JSONObject jsonObject = new JSONObject(json);
-                                checkedPosition = jsonObject.optInt("id") - 1;
-                                // 切换摄像头
-                                cameraTCPLink.start_camera(Car, checkedPosition + 1, 1);
-                                // 刷新按钮位置
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        // 刷新按钮位置
-                                        customerAdapter.notifyDataSetChanged();
-                                    }
-                                });
-                            }
+                            checkedPosition = remoteTCPLink.getCameraNumber(remoteTCPLink.getJson());
+                            Log.i(TAG, "run: " + checkedPosition);
+                            // 切换摄像头
+                            cameraTCPLink.start_camera(Car, 1, 1);
+                            // 刷新按钮位置
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    // 刷新按钮位置
+                                    customerAdapter.notifyDataSetChanged();
+                                    // 开始拍照，并用百度云分析
+                                    isBeat = true;
+                                    Log.i(TAG, "run:嘻嘻");
+                                }
+                            });
                         }
                     }
                 } catch (
-                        JSONException e) {
+                        Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -169,9 +211,69 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    iv_snap_shot.setImageBitmap(bitmap);
+                                    /*iv_snap_shot.setImageBitmap(bitmap);*/
                                 }
                             });
+
+                            if (isBeat) {
+                                Log.i(TAG, "run: 哈哈");
+                                Drawable drawable = iv_snap_shot.getDrawable();
+                                Network.getORCString(drawable, Values.LICENSE_PLATE_ORC_URL, ORCBean.class, new Network.ResultData<ORCBean>() {
+                                    @Override
+                                    public void result(ORCBean orcBean) {
+                                        Message message = Message.obtain();
+                                        if (orcBean != null) {
+                                            message.obj = "车牌识别成功";
+                                            message.what = 0;
+                                            handler.sendMessage(message);
+                                            // 创建当前监控车辆对象的容器
+                                            ViolateBean obj = null;
+                                            String numberPlate = orcBean.getWords_result().getNumber();
+                                            String camera = buttonNames.get(checkedPosition);
+                                            // 当前拍摄的车辆
+                                            for (ViolateBean violateBean : violateBeans) {
+                                                if (violateBean.getNumberPlate().equals(numberPlate)) {
+                                                    obj = violateBean;
+                                                    break;
+                                                }
+                                            }
+
+                                            if (checkedPosition >= 0 && checkedPosition <= 3) {//0、1、2、3
+                                                if (obj == null) {
+                                                    violateBeans.add(new ViolateBean(camera, numberPlate, 0, true));
+                                                } else {
+                                                    obj.updateViolate(camera);
+                                                }
+                                            } else if (checkedPosition >= 4 && checkedPosition <= 7) {//4、5、6、7
+                                                if (obj != null) {
+                                                    // 验证当前车辆是否闯红灯
+                                                    if (obj.ViolateCheck(camera, numberPlate)) {
+                                                        ViolateBean finalObj = obj;
+                                                        runOnUiThread(new Runnable() {
+                                                            @SuppressLint("SetTextI18n")
+                                                            @Override
+                                                            public void run() {
+                                                                tv_measure.setText(finalObj.getCamera_two() + "抓拍，百度云测算中；");
+                                                                tv_tips.setText("车牌号:" + finalObj.getNumberPlate() + "，违章：闯红灯，第" + finalObj.getViolateCount() + "次拍照");
+                                                            }
+                                                        });
+                                                    }
+                                                }
+                                            }
+
+                                            Log.i(TAG, "run: " + violateBeans.toString());
+                                        } else {
+                                            message.obj = "车牌识别失败";
+                                            message.what = 0;
+                                            handler.sendMessage(message);
+                                        }
+                                    }
+                                });
+
+                                // 拍摄一张照片
+                                isBeat = false;
+                                Log.i(TAG, "isBeat : " + isBeat);
+                            }
                         }
                     }
                 }
@@ -215,6 +317,8 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
             if (checkedPosition == position) {
                 // 将选中的按钮的状态更改为true
                 cbCamera.setChecked(true);
+                // 打开指定位置的摄像头
+                cameraTCPLink.start_camera("小车", position + 1, position);
             }
 
             cbCamera.setOnClickListener(null);
@@ -223,8 +327,6 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                 public void onClick(View v) {
                     // 选中item的position
                     checkedPosition = position;
-                    // 打开指定位置的摄像头
-                    cameraTCPLink.start_camera("小车", position + 1, position);
                     // 刷新列表更新当前按钮状态
                     customerAdapter.notifyDataSetChanged();
                     /*App.showToast("点击了：" + getItem(position) + "按钮");*/

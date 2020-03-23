@@ -8,6 +8,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.realmax.opentrafficversion.bean.CameraBodyBean;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -292,7 +295,7 @@ public class TCPLinks {
                 // 结束拼接数据的标记
                 char right = '}';
                 // 读取一段数据
-                byte[] bytes = new byte[2048];
+                byte[] bytes = new byte[1024];
                 int read = inputStream.read(bytes);
                 String s = new String(bytes, 0, read);
                 // 将数据进行遍历
@@ -315,7 +318,6 @@ public class TCPLinks {
                         // 初始化StringBuilder
                         result = new StringBuffer();
                         // 这里就直接截取了字符串，直接获取图片的信息
-                        Log.i(TAG, "getJson: " + jsonStr);
                         return jsonStr;
                     }
                 }
@@ -325,6 +327,19 @@ public class TCPLinks {
             }
         }
         return "";
+    }
+
+    public int getCameraNumber(String json) {
+        try {
+            if ("".equals(json)) {
+                return -1;
+            }
+            JSONObject jsonObject = new JSONObject(json);
+            return jsonObject.optInt("id") - 1;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return -1;
+        }
     }
 
     /**
