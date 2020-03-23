@@ -8,6 +8,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.realmax.opentrafficversion.bean.CameraBodyBean;
 
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -315,6 +317,8 @@ public class TCPLinks {
                         // 初始化StringBuilder
                         result = new StringBuffer();
                         // 这里就直接截取了字符串，直接获取图片的信息
+                        JSONObject jsonObject = new JSONObject(jsonStr);
+                        Log.i(TAG, "fetch_camera: " + jsonObject.optString("id"));
                         return jsonStr;
                     }
                 }
@@ -340,7 +344,7 @@ public class TCPLinks {
         try {
             CameraBodyBean cameraBodyBean = new Gson().fromJson(imageData, CameraBodyBean.class);
             String cameraImg = cameraBodyBean.getCameraImg();
-            return cameraImg.equals("") ? "" : cameraImg;
+            return "".equals(cameraImg) ? "" : cameraImg;
         } catch (JsonSyntaxException e) {
             e.printStackTrace();
             // 出现json解析异常，处理特定异常{����{"cmd":"play","deviceType":"\u5c0f\u8f66","deviceId":1,"cameraNum":1}

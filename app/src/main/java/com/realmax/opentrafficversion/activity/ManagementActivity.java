@@ -15,7 +15,6 @@ import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
 
-import com.realmax.opentrafficversion.App;
 import com.realmax.opentrafficversion.R;
 import com.realmax.opentrafficversion.utils.EncodeAndDecode;
 import com.realmax.opentrafficversion.utils.TCPLinks;
@@ -195,7 +194,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                     checkedPosition = position;
                     // 刷新列表更新当前按钮状态
                     customerAdapter.notifyDataSetChanged();
-                    App.showToast("点击了：" + getItem(position) + "按钮");
+                    /*App.showToast("点击了：" + getItem(position) + "按钮");*/
                 }
             });
             return view;
