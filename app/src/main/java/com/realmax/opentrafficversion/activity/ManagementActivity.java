@@ -211,7 +211,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    /*iv_snap_shot.setImageBitmap(bitmap);*/
+                                    iv_snap_shot.setImageBitmap(bitmap);
                                 }
                             });
 
