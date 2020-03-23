@@ -282,7 +282,7 @@ public class TCPLinks {
      *
      * @return 提取出json字符串
      */
-    public String fetch_camera() {
+    public String getJson() {
         if (socket != null) {
             try {
                 // 因为照片的base64编码格式的数据较多，服务端会一段一段的发送数据片段，不能够一下拿到整条数据
@@ -315,6 +315,7 @@ public class TCPLinks {
                         // 初始化StringBuilder
                         result = new StringBuffer();
                         // 这里就直接截取了字符串，直接获取图片的信息
+                        Log.i(TAG, "getJson: " + jsonStr);
                         return jsonStr;
                     }
                 }

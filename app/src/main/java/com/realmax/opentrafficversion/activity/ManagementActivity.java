@@ -19,9 +19,13 @@ import com.realmax.opentrafficversion.R;
 import com.realmax.opentrafficversion.utils.EncodeAndDecode;
 import com.realmax.opentrafficversion.utils.TCPLinks;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 public class ManagementActivity extends BaseActivity implements View.OnClickListener {
+    public static final String Car = "小车";
     private TextView tv_camera_state;
     private TextView tv_control_state;
     private ImageView iv_snap_shot;
@@ -41,9 +45,9 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
      */
     private TCPLinks remoteTCPLink;
     /**
-     * 是否获取小车摄像头数据的标识符
+     * 是否获取数据
      */
-    private boolean cameraFlag = false;
+    private boolean flag = true;
     /**
      * 按钮名称的集合
      */
@@ -52,6 +56,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
      * 继承了BaseAdapter的数据适配器
      */
     private CustomerAdapter customerAdapter;
+    private int checkedPosition = 0;
 
     @Override
     protected int getLayoutId() {
@@ -115,7 +120,35 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
      * 获取违章拍摄的摄像头
      */
     private void violate() {
-
+        new Thread() {
+            @Override
+            public void run() {
+                super.run();
+                try {
+                    if (remoteSocket != null) {
+                        while (flag) {
+                            String json = remoteTCPLink.getJson();
+                            if (!TextUtils.isEmpty(json)) {
+                                JSONObject jsonObject = new JSONObject(json);
+                                checkedPosition = jsonObject.optInt("id") - 1;
+                                // 切换摄像头
+                                cameraTCPLink.start_camera(Car, checkedPosition + 1, 1);
+                                // 刷新按钮位置
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        customerAdapter.notifyDataSetChanged();
+                                    }
+                                });
+                            }
+                        }
+                    }
+                } catch (
+                        JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
     }
 
     /**
@@ -128,8 +161,8 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
             public void run() {
                 super.run();
                 if (cameraSocket != null) {
-                    while (!cameraFlag) {
-                        String imageData = cameraTCPLink.getImageData(cameraTCPLink.fetch_camera());
+                    while (flag) {
+                        String imageData = cameraTCPLink.getImageData(cameraTCPLink.getJson());
                         if (!TextUtils.isEmpty(imageData)) {
                             Bitmap bitmap = EncodeAndDecode.decodeBase64ToImage(imageData);
                             runOnUiThread(new Runnable() {
@@ -147,7 +180,6 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
 
     class CustomerAdapter extends BaseAdapter {
         private CheckBox cbCamera;
-        private int checkedPosition = 0;
 
         @Override
         public int getCount() {
@@ -203,6 +235,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
         private void initView(View view) {
             cbCamera = (CheckBox) view.findViewById(R.id.cb_camera);
         }
+
     }
 
 
@@ -218,7 +251,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        cameraFlag = true;
+        flag = false;
         cameraTCPLink.stop_camera();
     }
 }
