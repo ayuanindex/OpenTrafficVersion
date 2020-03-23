@@ -137,6 +137,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
+                                        // 刷新按钮位置
                                         customerAdapter.notifyDataSetChanged();
                                     }
                                 });
@@ -214,8 +215,6 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
             if (checkedPosition == position) {
                 // 将选中的按钮的状态更改为true
                 cbCamera.setChecked(true);
-                // 开启监控
-                cameraTCPLink.start_camera("小车", position + 1, position);
             }
 
             cbCamera.setOnClickListener(null);
@@ -224,6 +223,8 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                 public void onClick(View v) {
                     // 选中item的position
                     checkedPosition = position;
+                    // 打开指定位置的摄像头
+                    cameraTCPLink.start_camera("小车", position + 1, position);
                     // 刷新列表更新当前按钮状态
                     customerAdapter.notifyDataSetChanged();
                     /*App.showToast("点击了：" + getItem(position) + "按钮");*/
