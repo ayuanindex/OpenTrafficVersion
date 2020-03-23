@@ -8,8 +8,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.realmax.opentrafficversion.bean.CameraBodyBean;
 
-import org.json.JSONObject;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -317,8 +315,6 @@ public class TCPLinks {
                         // 初始化StringBuilder
                         result = new StringBuffer();
                         // 这里就直接截取了字符串，直接获取图片的信息
-                        JSONObject jsonObject = new JSONObject(jsonStr);
-                        Log.i(TAG, "fetch_camera: " + jsonObject.optString("id"));
                         return jsonStr;
                     }
                 }
