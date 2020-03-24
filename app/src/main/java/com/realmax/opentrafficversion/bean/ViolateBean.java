@@ -1,15 +1,26 @@
 package com.realmax.opentrafficversion.bean;
 
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
+
 import java.util.Objects;
 
+@DatabaseTable(tableName = "violateTable")
 public class ViolateBean {
+    @DatabaseField(columnName = "id", generatedId = true)
+    private int id;
+    @DatabaseField(columnName = "camera")
     private String camera;
+    @DatabaseField(columnName = "numberPlate")
     private String numberPlate;
+    @DatabaseField(columnName = "violateCount")
     private int violateCount;
     /**
      * 是否记录违章
      */
+    @DatabaseField(columnName = "isViolate")
     private boolean isViolate = false;
+    @DatabaseField(columnName = "camera_two")
     private String camera_two;
 
     public ViolateBean() {

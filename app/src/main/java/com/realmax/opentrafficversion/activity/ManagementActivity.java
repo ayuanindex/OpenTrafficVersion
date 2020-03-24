@@ -20,11 +20,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
+import com.j256.ormlite.dao.Dao;
 import com.realmax.opentrafficversion.App;
 import com.realmax.opentrafficversion.R;
 import com.realmax.opentrafficversion.Values;
 import com.realmax.opentrafficversion.bean.ORCBean;
 import com.realmax.opentrafficversion.bean.ViolateBean;
+import com.realmax.opentrafficversion.dao.OrmHelper;
 import com.realmax.opentrafficversion.utils.EncodeAndDecode;
 import com.realmax.opentrafficversion.utils.Network;
 import com.realmax.opentrafficversion.utils.TCPLinks;
@@ -96,6 +98,8 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
             }
         }
     };
+    private OrmHelper ormHelper;
+    private Dao<ViolateBean, ?> violateDao;
 
     @Override
     protected int getLayoutId() {
@@ -151,6 +155,21 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
 
         cameraTCPLink = new TCPLinks(cameraSocket);
         remoteTCPLink = new TCPLinks(remoteSocket);
+
+        // 测试图片识别
+        Network.getORCString(iv_snap_shot.getDrawable(), Values.LICENSE_PLATE_ORC_URL, ORCBean.class, new Network.ResultData<ORCBean>() {
+            @Override
+            public void result(ORCBean orcBean) {
+
+                Log.i(TAG, "result: " + orcBean.toString());
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        App.showToast(orcBean.getWords_result().getNumber());
+                    }
+                });
+            }
+        });
 
         // 获取摄像头拍摄数据
         getImageData();

@@ -54,6 +54,7 @@ public class App extends Application {
                 return;
             }
         }
+
         progressDialog = new ProgressDialog(activity);
         progressDialog.setTitle("提示");
         progressDialog.setMessage(msg);
