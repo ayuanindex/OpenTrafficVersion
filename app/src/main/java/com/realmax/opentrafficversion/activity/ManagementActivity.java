@@ -170,20 +170,21 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                     if (remoteSocket != null) {
                         while (flag) {
                             checkedPosition = remoteTCPLink.getCameraNumber(remoteTCPLink.getJson());
-                            Log.i(TAG, "run: " + checkedPosition);
-                            // 切换摄像头
-                            cameraTCPLink.start_camera(Car, 1, 1);
-                            // 刷新按钮位置
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    // 刷新按钮位置
-                                    customerAdapter.notifyDataSetChanged();
-                                    // 开始拍照，并用百度云分析
-                                    isBeat = true;
-                                    Log.i(TAG, "run:嘻嘻");
-                                }
-                            });
+                            if (checkedPosition >= 0) {
+                                // 切换摄像头
+                                cameraTCPLink.start_camera(Car, 1, 1);
+                                // 刷新按钮位置
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        // 刷新按钮位置
+                                        customerAdapter.notifyDataSetChanged();
+                                        // 开始拍照，并用百度云分析
+                                        isBeat = true;
+                                        App.showToast("检测到车辆压线，正在监控当前车辆");
+                                    }
+                                });
+                            }
                         }
                     }
                 } catch (
