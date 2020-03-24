@@ -129,7 +129,8 @@ public class TCPLinks {
                     /*stop_camera();aw
                     sleep(1000);*/
                     // 准备好的拍照指令
-                    String command = "{\"cmd\": \"start\", \"deviceType\": \"" + device_type + "\", \"deviceId\": " + device_id + ", \"cameraNum\": " + camera_num + "}";
+                    String command = "{\"cmd\": \"start\", \"deviceType\": 5, \"deviceId\": " + device_id + ", \"cameraNum\": " + camera_num + "}";
+                    /*String command = "{\"cmd\": \"start\", \"deviceType\": \"" + device_type + "\", \"deviceId\": " + device_id + ", \"cameraNum\": " + camera_num + "}";*/
                     // 通过EncodeAndDecode工具累中的getStrUnicode方法将需要传输的数据进行Unicode编码
                     // 通过option()对需要发送的指令进行数据加工（帧头，协议版本号，帧长度，checkSum验证，帧尾）
                     byte[] combine = option(EncodeAndDecode.getStrUnicode(command));

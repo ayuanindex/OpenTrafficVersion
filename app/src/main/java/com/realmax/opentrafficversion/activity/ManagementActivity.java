@@ -156,21 +156,6 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
         cameraTCPLink = new TCPLinks(cameraSocket);
         remoteTCPLink = new TCPLinks(remoteSocket);
 
-        // 测试图片识别
-        Network.getORCString(iv_snap_shot.getDrawable(), Values.LICENSE_PLATE_ORC_URL, ORCBean.class, new Network.ResultData<ORCBean>() {
-            @Override
-            public void result(ORCBean orcBean) {
-
-                Log.i(TAG, "result: " + orcBean.toString());
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        App.showToast(orcBean.getWords_result().getNumber());
-                    }
-                });
-            }
-        });
-
         // 获取摄像头拍摄数据
         getImageData();
         // 获取违章数据
@@ -191,7 +176,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                             checkedPosition = remoteTCPLink.getCameraNumber(remoteTCPLink.getJson());
                             if (checkedPosition >= 0) {
                                 // 切换摄像头
-                                cameraTCPLink.start_camera(Car, 1, 1);
+                                cameraTCPLink.start_camera(Car, 1, checkedPosition + 1);
                                 // 刷新按钮位置
                                 runOnUiThread(new Runnable() {
                                     @Override
@@ -203,6 +188,8 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                                         App.showToast("检测到车辆压线，正在监控当前车辆");
                                     }
                                 });
+                            } else {
+                                checkedPosition = 0;
                             }
                         }
                     }
@@ -338,7 +325,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                 // 将选中的按钮的状态更改为true
                 cbCamera.setChecked(true);
                 // 打开指定位置的摄像头
-                cameraTCPLink.start_camera("小车", position + 1, position);
+                cameraTCPLink.start_camera(Car, 1, position + 1);
             }
 
             cbCamera.setOnClickListener(null);
