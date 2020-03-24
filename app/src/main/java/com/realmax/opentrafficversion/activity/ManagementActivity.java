@@ -24,6 +24,7 @@ import com.j256.ormlite.dao.Dao;
 import com.realmax.opentrafficversion.App;
 import com.realmax.opentrafficversion.R;
 import com.realmax.opentrafficversion.Values;
+import com.realmax.opentrafficversion.bean.ButtonBean;
 import com.realmax.opentrafficversion.bean.ORCBean;
 import com.realmax.opentrafficversion.bean.ViolateBean;
 import com.realmax.opentrafficversion.dao.OrmHelper;
@@ -77,7 +78,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
     /**
      * 按钮名称的集合
      */
-    private ArrayList<String> buttonNames;
+    private ArrayList<ButtonBean> buttonNames;
     /**
      * 继承了BaseAdapter的数据适配器
      */
@@ -138,6 +139,16 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
 
         // 初始化按钮名称集合
         buttonNames = new ArrayList<>();
+        buttonNames.add(new ButtonBean("A1", 1));
+        buttonNames.add(new ButtonBean("B1", 3));
+        buttonNames.add(new ButtonBean("C1", 5));
+        buttonNames.add(new ButtonBean("D1", 7));
+        buttonNames.add(new ButtonBean("A2", 2));
+        buttonNames.add(new ButtonBean("B2", 4));
+        buttonNames.add(new ButtonBean("C2", 6));
+        buttonNames.add(new ButtonBean("D2", 8));
+
+        /*buttonNames = new ArrayList<>();
         buttonNames.add("A1");
         buttonNames.add("B1");
         buttonNames.add("C1");
@@ -145,7 +156,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
         buttonNames.add("A2");
         buttonNames.add("B2");
         buttonNames.add("C2");
-        buttonNames.add("D2");
+        buttonNames.add("D2");*/
 
         customerAdapter = new CustomerAdapter();
         gv_btns.setAdapter(customerAdapter);
@@ -175,6 +186,13 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                         while (flag) {
                             checkedPosition = remoteTCPLink.getCameraNumber(remoteTCPLink.getJson());
                             if (checkedPosition >= 0) {
+                                for (int i = 0; i < buttonNames.size(); i++) {
+                                    int id = buttonNames.get(i).getId();
+                                    if (id == checkedPosition + 1) {
+                                        checkedPosition = i;
+                                        break;
+                                    }
+                                }
                                 // 切换摄像头
                                 cameraTCPLink.start_camera(Car, 1, checkedPosition + 1);
                                 // 刷新按钮位置
@@ -236,7 +254,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                                             // 创建当前监控车辆对象的容器
                                             ViolateBean obj = null;
                                             String numberPlate = orcBean.getWords_result().getNumber();
-                                            String camera = buttonNames.get(checkedPosition);
+                                            String camera = buttonNames.get(checkedPosition).getName();
                                             // 当前拍摄的车辆
                                             for (ViolateBean violateBean : violateBeans) {
                                                 if (violateBean.getNumberPlate().equals(numberPlate)) {
@@ -297,7 +315,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
         }
 
         @Override
-        public String getItem(int position) {
+        public ButtonBean getItem(int position) {
             return buttonNames.get(position);
         }
 
@@ -316,7 +334,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
             }
             initView(view);
             // 设置按钮显示的文字
-            cbCamera.setText(getItem(position));
+            cbCamera.setText(getItem(position).getName());
             // 设置按钮的默认选中状态
             cbCamera.setChecked(false);
 
@@ -325,7 +343,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                 // 将选中的按钮的状态更改为true
                 cbCamera.setChecked(true);
                 // 打开指定位置的摄像头
-                cameraTCPLink.start_camera(Car, 1, position + 1);
+                cameraTCPLink.start_camera(Car, 1, getItem(position).getId());
             }
 
             cbCamera.setOnClickListener(null);
@@ -333,7 +351,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                 @Override
                 public void onClick(View v) {
                     // 选中item的position
-                    checkedPosition = position;
+                    checkedPosition = getItem(position).getId();
                     // 刷新列表更新当前按钮状态
                     customerAdapter.notifyDataSetChanged();
                     /*App.showToast("点击了：" + getItem(position) + "按钮");*/
