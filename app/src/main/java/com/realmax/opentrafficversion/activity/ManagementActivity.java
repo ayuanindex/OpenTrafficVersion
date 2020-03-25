@@ -28,11 +28,14 @@ import com.realmax.opentrafficversion.bean.ButtonBean;
 import com.realmax.opentrafficversion.bean.ORCBean;
 import com.realmax.opentrafficversion.bean.ViolateBean;
 import com.realmax.opentrafficversion.dao.OrmHelper;
+import com.realmax.opentrafficversion.dao.ViolateDaoUtil;
 import com.realmax.opentrafficversion.utils.EncodeAndDecode;
 import com.realmax.opentrafficversion.utils.Network;
 import com.realmax.opentrafficversion.utils.TCPLinks;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ManagementActivity extends BaseActivity implements View.OnClickListener {
     public static final String Car = "小车";
@@ -84,7 +87,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
      */
     private CustomerAdapter customerAdapter;
     private int checkedPosition = 0;
-    private ArrayList<ViolateBean> violateBeans;
+    private List<ViolateBean> violateBeans;
 
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler() {
@@ -154,6 +157,24 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
         // 初始化违章车辆集合
         violateBeans = new ArrayList<>();
 
+        new Thread() {
+            @Override
+            public void run() {
+                super.run();
+                try {
+                    // 获取数据库对象
+                    ormHelper = OrmHelper.getInstance();
+                    // 获取Dao
+                    violateDao = ormHelper.getDao(ViolateBean.class);
+                    // 获取所有的数据
+                    violateBeans = violateDao.queryForAll();
+                    Log.i(TAG, "run: 所有数据：" + violateBeans.toString());
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+
         cameraTCPLink = new TCPLinks(cameraSocket);
         remoteTCPLink = new TCPLinks(remoteSocket);
 
@@ -183,8 +204,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                                         break;
                                     }
                                 }
-                                /*// 切换摄像头
-                                cameraTCPLink.start_camera(Car, 1, checkedPosition + 1);*/
+
                                 // 刷新按钮位置
                                 runOnUiThread(new Runnable() {
                                     @Override
@@ -194,9 +214,6 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                                         App.showToast("检测到车辆压线，正在监控当前车辆");
                                     }
                                 });
-                                /*sleep(500);
-                                // 开始拍照，并用百度云分析
-                                isBeat = true;*/
                             } else {
                                 checkedPosition = 0;
                             }
@@ -247,6 +264,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                                             message.obj = "车牌识别成功";
                                             message.what = 0;
                                             handler.sendMessage(message);
+
                                             // 创建当前监控车辆对象的容器
                                             ViolateBean obj = null;
                                             String numberPlate = orcBean.getWords_result().getNumber();
@@ -261,14 +279,18 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
 
                                             if (checkedPosition >= 0 && checkedPosition <= 3) {//0、1、2、3
                                                 if (obj == null) {
-                                                    violateBeans.add(new ViolateBean(camera, numberPlate, 0, true));
+                                                    ViolateBean e = new ViolateBean(camera, numberPlate, 0, true);
+                                                    violateBeans.add(e);
+                                                    ViolateDaoUtil.add(e);
                                                 } else {
                                                     obj.updateViolate(camera);
+                                                    ViolateDaoUtil.updateToCamera(obj);
                                                 }
                                             } else if (checkedPosition >= 4 && checkedPosition <= 7) {//4、5、6、7
                                                 if (obj != null) {
                                                     // 验证当前车辆是否闯红灯
                                                     if (obj.ViolateCheck(camera, numberPlate)) {
+                                                        ViolateDaoUtil.updateToCount(obj);
                                                         ViolateBean finalObj = obj;
                                                         runOnUiThread(new Runnable() {
                                                             @SuppressLint("SetTextI18n")

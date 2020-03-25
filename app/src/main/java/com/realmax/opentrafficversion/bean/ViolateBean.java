@@ -81,8 +81,8 @@ public class ViolateBean {
      * @return 返回判断标示符：true表示违章，违章次数+1，false表示没有违章
      */
     public boolean ViolateCheck(String camera, String numberPlate) {
-        camera_two = camera;
-        if (this.isViolate && this.camera.charAt(0) == camera.charAt(0) && this.numberPlate.equals(numberPlate)) {
+        this.camera_two = camera;
+        if (this.isViolate && this.camera.charAt(0) == this.camera_two.charAt(0) && this.numberPlate.equals(numberPlate)) {
             this.violateCount++;
             // 停止继续验证此车辆
             this.isViolate = false;
