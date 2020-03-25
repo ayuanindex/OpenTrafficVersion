@@ -148,16 +148,6 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
         buttonNames.add(new ButtonBean("C2", 6));
         buttonNames.add(new ButtonBean("D2", 8));
 
-        /*buttonNames = new ArrayList<>();
-        buttonNames.add("A1");
-        buttonNames.add("B1");
-        buttonNames.add("C1");
-        buttonNames.add("D1");
-        buttonNames.add("A2");
-        buttonNames.add("B2");
-        buttonNames.add("C2");
-        buttonNames.add("D2");*/
-
         customerAdapter = new CustomerAdapter();
         gv_btns.setAdapter(customerAdapter);
 
@@ -193,8 +183,8 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                                         break;
                                     }
                                 }
-                                // 切换摄像头
-                                cameraTCPLink.start_camera(Car, 1, checkedPosition + 1);
+                                /*// 切换摄像头
+                                cameraTCPLink.start_camera(Car, 1, checkedPosition + 1);*/
                                 // 刷新按钮位置
                                 runOnUiThread(new Runnable() {
                                     @Override
@@ -204,16 +194,15 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                                         App.showToast("检测到车辆压线，正在监控当前车辆");
                                     }
                                 });
-                                sleep(500);
+                                /*sleep(500);
                                 // 开始拍照，并用百度云分析
-                                isBeat = true;
+                                isBeat = true;*/
                             } else {
                                 checkedPosition = 0;
                             }
                         }
                     }
-                } catch (
-                        Exception e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -299,6 +288,9 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                                 // 拍摄一张照片
                                 isBeat = false;
                                 Log.i(TAG, "isBeat : " + isBeat);
+                                if (drawable == null) {
+                                    isBeat = true;
+                                }
                             }
                         }
                     }
@@ -345,6 +337,18 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                 cbCamera.setChecked(true);
                 // 打开指定位置的摄像头
                 cameraTCPLink.start_camera(Car, 1, getItem(position).getId());
+                new Thread() {
+                    @Override
+                    public void run() {
+                        super.run();
+                        try {
+                            sleep(400);
+                            isBeat = true;
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }.start();
             }
 
             cbCamera.setOnClickListener(null);
