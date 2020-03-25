@@ -38,7 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ManagementActivity extends BaseActivity implements View.OnClickListener {
-    public static final String Car = "小车";
+    public static final String Car = "十字交叉路口";
     private TextView tv_camera_state;
     private TextView tv_control_state;
     private ImageView iv_snap_shot;
@@ -188,12 +188,14 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
      */
     private void violate() {
         new Thread() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void run() {
                 super.run();
                 try {
                     if (remoteSocket != null) {
                         while (flag) {
+                            Log.i(TAG, "run: xixixi");
                             checkedPosition = remoteTCPLink.getCameraNumber(remoteTCPLink.getJson());
                             if (checkedPosition >= 0) {
                                 for (int i = 0; i < buttonNames.size(); i++) {
@@ -208,14 +210,16 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
+
                                         // 刷新按钮位置
                                         customerAdapter.notifyDataSetChanged();
-                                        App.showToast("检测到车辆压线，正在监控当前车辆");
+                                        tv_measure.setText("检测到车辆压线，正在监控当前车辆");
+                                        // 进行车牌号识别
+                                        orcNumberPlate();
                                     }
                                 });
 
-                                sleep(400);
-                                isBeat = true;
+
                             } else {
                                 checkedPosition = 0;
                             }
@@ -239,92 +243,119 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                 super.run();
                 if (cameraSocket != null) {
                     while (flag) {
-                        String imageData = cameraTCPLink.getImageData(cameraTCPLink.getJson());
-                        if (!TextUtils.isEmpty(imageData)) {
-                            Bitmap bitmap = EncodeAndDecode.decodeBase64ToImage(imageData);
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    iv_snap_shot.setImageBitmap(bitmap);
-                                }
-                            });
-
-                            if (isBeat) {
-                                Log.i(TAG, "run: 哈哈");
-                                Drawable drawable = iv_snap_shot.getDrawable();
-
-                                isBeat = false;
-                                if (drawable == null) {
-                                    isBeat = true;
-                                }
-
-                                Network.getORCString(drawable, Values.LICENSE_PLATE_ORC_URL, ORCBean.class, new Network.ResultData<ORCBean>() {
+                        if (!isBeat) {
+                            String imageData = cameraTCPLink.getImageData(cameraTCPLink.getJson());
+                            if (!TextUtils.isEmpty(imageData)) {
+                                Bitmap bitmap = EncodeAndDecode.decodeBase64ToImage(imageData);
+                                runOnUiThread(new Runnable() {
                                     @Override
-                                    public void result(ORCBean orcBean) {
-                                        Message message = Message.obtain();
-                                        if (orcBean != null) {
-                                            message.obj = "车牌识别成功";
-                                            message.what = 0;
-                                            handler.sendMessage(message);
-
-                                            // 创建当前监控车辆对象的容器
-                                            ViolateBean obj = null;
-                                            String numberPlate = orcBean.getWords_result().getNumber();
-                                            String camera = buttonNames.get(checkedPosition).getName();
-                                            // 当前拍摄的车辆
-                                            for (ViolateBean violateBean : violateBeans) {
-                                                if (violateBean.getNumberPlate().equals(numberPlate)) {
-                                                    obj = violateBean;
-                                                    break;
-                                                }
-                                            }
-
-                                            if (checkedPosition >= 0 && checkedPosition <= 3) {//0、1、2、3
-                                                if (obj == null) {
-                                                    ViolateBean e = new ViolateBean(camera, numberPlate, 0, true);
-                                                    violateBeans.add(e);
-                                                    ViolateDaoUtil.add(e);
-                                                } else {
-                                                    obj.updateViolate(camera);
-                                                    ViolateDaoUtil.updateToCamera(obj);
-                                                }
-                                            } else if (checkedPosition >= 4 && checkedPosition <= 7) {//4、5、6、7
-                                                if (obj != null) {
-                                                    // 验证当前车辆是否闯红灯
-                                                    if (obj.ViolateCheck(camera, numberPlate)) {
-                                                        ViolateDaoUtil.updateToCount(obj);
-                                                        ViolateBean finalObj = obj;
-                                                        runOnUiThread(new Runnable() {
-                                                            @SuppressLint("SetTextI18n")
-                                                            @Override
-                                                            public void run() {
-                                                                tv_measure.setText(finalObj.getCamera_two() + "抓拍，百度云测算中；");
-                                                                tv_tips.setText("车牌号:" + finalObj.getNumberPlate() + "，违章：闯红灯，第" + finalObj.getViolateCount() + "次拍照");
-                                                            }
-                                                        });
-                                                    }
-                                                }
-                                            }
-
-                                            Log.i(TAG, "run: " + violateBeans.toString());
-                                        } else {
-                                            message.obj = "车牌识别失败";
-                                            message.what = 0;
-                                            handler.sendMessage(message);
-                                        }
-                                    }
-
-                                    @Override
-                                    public void error() {
-                                        isBeat = true;
+                                    public void run() {
+                                        iv_snap_shot.setImageBitmap(bitmap);
                                     }
                                 });
                             }
-
-                            isBeat = false;
                         }
                     }
                 }
+            }
+        }.start();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void orcNumberPlate() {
+        new Thread() {
+            @Override
+            public void run() {
+                super.run();
+                try {
+                    sleep(300);
+                    isBeat = true;
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                Log.i(TAG, "run: 获取违章图片");
+                Drawable drawable = iv_snap_shot.getDrawable();
+                Network.getORCString(drawable, Values.LICENSE_PLATE_ORC_URL, ORCBean.class, new Network.ResultData<ORCBean>() {
+                    @Override
+                    public void result(ORCBean orcBean) {
+                        Message message = Message.obtain();
+                        isBeat = false;
+                        if (orcBean != null) {
+                            message.obj = "车牌识别成功";
+                            message.what = 0;
+                            handler.sendMessage(message);
+
+                            // 创建当前监控车辆对象的容器
+                            ViolateBean obj = null;
+                            String numberPlate = orcBean.getWords_result().getNumber();
+                            String camera = buttonNames.get(checkedPosition).getName();
+                            // 当前拍摄的车辆
+                            for (ViolateBean violateBean : violateBeans) {
+                                if (violateBean.getNumberPlate().equals(numberPlate)) {
+                                    obj = violateBean;
+                                    break;
+                                }
+                            }
+
+                            if (checkedPosition >= 0 && checkedPosition <= 3) {//0、1、2、3
+                                if (obj == null) {
+                                    ViolateBean e = new ViolateBean(camera, numberPlate, 0, true);
+                                    violateBeans.add(e);
+                                    ViolateDaoUtil.add(e);
+                                } else {
+                                    obj.updateViolate(camera);
+                                    ViolateDaoUtil.updateToCamera(obj);
+                                }
+                                runOnUiThread(new Runnable() {
+                                    @SuppressLint("SetTextI18n")
+                                    @Override
+                                    public void run() {
+                                        tv_measure.setText(camera + "抓拍，百度云测算中；");
+                                        tv_tips.setText("车牌号:" + numberPlate + "，违章：判定压线");
+                                    }
+                                });
+                            } else if (checkedPosition >= 4 && checkedPosition <= 7) {//4、5、6、7
+                                if (obj != null) {
+                                    // 验证当前车辆是否闯红灯
+                                    if (obj.ViolateCheck(camera, numberPlate)) {
+                                        ViolateDaoUtil.updateToCount(obj);
+                                        ViolateBean finalObj = obj;
+                                        runOnUiThread(new Runnable() {
+                                            @SuppressLint("SetTextI18n")
+                                            @Override
+                                            public void run() {
+                                                tv_measure.setText(camera + "抓拍，百度云测算中；");
+                                                tv_tips.setText("车牌号:" + numberPlate + "，违章：闯红灯，第" + finalObj.getViolateCount() + "次拍照");
+                                            }
+                                        });
+                                    }
+                                } else {
+                                    runOnUiThread(new Runnable() {
+                                        @SuppressLint("SetTextI18n")
+                                        @Override
+                                        public void run() {
+                                            tv_measure.setText(camera + "抓拍，百度云测算中；");
+                                            tv_tips.setText("车牌号:" + numberPlate + "，违章：闯红灯，第1次拍照");
+                                        }
+                                    });
+                                    ViolateBean e = new ViolateBean("", numberPlate, 1, false);
+                                    e.setCamera_two(camera);
+                                    violateBeans.add(e);
+                                    ViolateDaoUtil.add(e);
+                                }
+                            }
+                        } else {
+                            message.obj = "车牌识别失败";
+                            message.what = 0;
+                            handler.sendMessage(message);
+                        }
+                    }
+
+                    @Override
+                    public void error() {
+
+                    }
+                });
             }
         }.start();
     }

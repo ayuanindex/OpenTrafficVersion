@@ -83,7 +83,7 @@ public class ViolateDaoUtil {
                         List<ViolateBean> violateBeans = queryByNumberPlate(violateBean);
                         if (violateBeans.size() >= 1) {
                             ViolateBean bean = violateBeans.get(0);
-                            bean.setCamera_two(violateBean.getCamera());
+                            bean.setCamera(violateBean.getCamera());
                             bean.setViolate(true);
                             violateDao.update(bean);
                         }
