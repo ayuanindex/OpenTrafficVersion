@@ -201,11 +201,12 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                                     public void run() {
                                         // 刷新按钮位置
                                         customerAdapter.notifyDataSetChanged();
-                                        // 开始拍照，并用百度云分析
-                                        isBeat = true;
                                         App.showToast("检测到车辆压线，正在监控当前车辆");
                                     }
                                 });
+                                sleep(500);
+                                // 开始拍照，并用百度云分析
+                                isBeat = true;
                             } else {
                                 checkedPosition = 0;
                             }
@@ -351,7 +352,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                 @Override
                 public void onClick(View v) {
                     // 选中item的position
-                    checkedPosition = getItem(position).getId();
+                    checkedPosition = position;
                     // 刷新列表更新当前按钮状态
                     customerAdapter.notifyDataSetChanged();
                     /*App.showToast("点击了：" + getItem(position) + "按钮");*/
