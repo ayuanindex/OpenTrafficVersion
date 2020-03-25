@@ -11,8 +11,10 @@ import com.google.gson.Gson;
 import com.realmax.opentrafficversion.App;
 import com.realmax.opentrafficversion.Values;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.concurrent.TimeUnit;
 
@@ -62,6 +64,8 @@ public class Network {
 
     public interface ResultData<T> {
         void result(T t);
+
+        void error();
     }
 
     /**
@@ -89,6 +93,11 @@ public class Network {
                     } else {
                         resultData.result(new Gson().fromJson(result, tClass));
                     }
+                } catch (NullPointerException e) {
+                    e.printStackTrace();
+                    resultData.error();
+                } catch (UnsupportedEncodingException | JSONException e) {
+                    e.printStackTrace();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

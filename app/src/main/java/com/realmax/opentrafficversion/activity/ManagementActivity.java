@@ -233,6 +233,12 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                             if (isBeat) {
                                 Log.i(TAG, "run: 哈哈");
                                 Drawable drawable = iv_snap_shot.getDrawable();
+
+                                isBeat = false;
+                                if (drawable == null) {
+                                    isBeat = true;
+                                }
+
                                 Network.getORCString(drawable, Values.LICENSE_PLATE_ORC_URL, ORCBean.class, new Network.ResultData<ORCBean>() {
                                     @Override
                                     public void result(ORCBean orcBean) {
@@ -283,15 +289,15 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                                             handler.sendMessage(message);
                                         }
                                     }
-                                });
 
-                                // 拍摄一张照片
-                                isBeat = false;
-                                Log.i(TAG, "isBeat : " + isBeat);
-                                if (drawable == null) {
-                                    isBeat = true;
-                                }
+                                    @Override
+                                    public void error() {
+                                        isBeat = true;
+                                    }
+                                });
                             }
+
+                            isBeat = false;
                         }
                     }
                 }
