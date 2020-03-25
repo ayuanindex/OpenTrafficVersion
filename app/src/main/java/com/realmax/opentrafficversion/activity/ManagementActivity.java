@@ -168,7 +168,6 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                     violateDao = ormHelper.getDao(ViolateBean.class);
                     // 获取所有的数据
                     violateBeans = violateDao.queryForAll();
-                    Log.i(TAG, "run: 所有数据：" + violateBeans.toString());
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -214,6 +213,9 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                                         App.showToast("检测到车辆压线，正在监控当前车辆");
                                     }
                                 });
+
+                                sleep(400);
+                                isBeat = true;
                             } else {
                                 checkedPosition = 0;
                             }
@@ -365,18 +367,6 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                 cbCamera.setChecked(true);
                 // 打开指定位置的摄像头
                 cameraTCPLink.start_camera(Car, 1, getItem(position).getId());
-                new Thread() {
-                    @Override
-                    public void run() {
-                        super.run();
-                        try {
-                            sleep(400);
-                            isBeat = true;
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }.start();
             }
 
             cbCamera.setOnClickListener(null);
