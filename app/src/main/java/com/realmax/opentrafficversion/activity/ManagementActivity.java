@@ -417,7 +417,6 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                 @Override
                 public void onClick(View v) {
                     // 更新提示文字
-                    tv_tips.setVisibility(View.GONE);
                     tv_measure.setVisibility(View.VISIBLE);
 
                     tv_tips.setText("");
