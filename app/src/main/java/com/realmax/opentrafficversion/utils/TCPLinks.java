@@ -349,15 +349,16 @@ public class TCPLinks {
      * @param imageData 服务端返回的json数据
      * @return 图片的base64编码
      */
-    public String getImageData(String imageData) {
+    public CameraBodyBean getImageData(String imageData) {
         if (TextUtils.isEmpty(imageData)) {
-            return "";
+            return null;
         }
 
         try {
             CameraBodyBean cameraBodyBean = new Gson().fromJson(imageData, CameraBodyBean.class);
-            String cameraImg = cameraBodyBean.getCameraImg();
-            return "".equals(cameraImg) ? "" : cameraImg;
+            return cameraBodyBean;
+            /*String cameraImg = cameraBodyBean.getCameraImg();
+            return "".equals(cameraImg) ? "" : cameraImg;*/
         } catch (JsonSyntaxException e) {
             e.printStackTrace();
             // 出现json解析异常，处理特定异常{����{"cmd":"play","deviceType":"\u5c0f\u8f66","deviceId":1,"cameraNum":1}
@@ -365,7 +366,7 @@ public class TCPLinks {
             Log.i(TAG, "getImageData: 出现异常：" + substring);
             getImageData(substring);
         }
-        return "";
+        return null;
     }
 
     /**

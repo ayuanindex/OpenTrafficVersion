@@ -59,7 +59,7 @@
             android:layout_marginStart="20dp"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="XX抓拍，百度云测算中；"
+            android:text="A1监控中"
             android:textColor="#ffffff"
             android:textSize="18sp" />
 
@@ -70,7 +70,7 @@
             android:layout_marginStart="20dp"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="车牌号XXX，违章：XXX，第n次拍照"
+            android:text=""
             android:textColor="#ffffff"
             android:textSize="18sp" />
     </LinearLayout>
