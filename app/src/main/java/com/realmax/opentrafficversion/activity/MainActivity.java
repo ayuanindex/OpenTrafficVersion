@@ -5,7 +5,7 @@ import android.widget.Button;
 
 import com.realmax.opentrafficversion.R;
 import com.realmax.opentrafficversion.dao.OrmHelper;
-import com.realmax.opentrafficversion.utils.TCPLinks;
+import com.realmax.opentrafficversion.utils.ValueUtil;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
     private Button btn_jump_management;
@@ -58,8 +58,20 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        TCPLinks.stop(cameraSocket);
-        TCPLinks.stop(remoteSocket);
+        new Thread() {
+            @Override
+            public void run() {
+                super.run();
+                try {
+                    ValueUtil.getCameraEventExecutors().shutdownGracefully().sync();
+                    ValueUtil.getRemoteEventExecutors().shutdownGracefully().sync();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+        /*TCPLinks.stop(cameraSocket);
+        TCPLinks.stop(remoteSocket);*/
         // 关闭数据库
         OrmHelper.getInstance().close();
     }

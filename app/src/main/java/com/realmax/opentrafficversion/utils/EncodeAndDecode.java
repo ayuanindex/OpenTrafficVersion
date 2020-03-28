@@ -29,7 +29,7 @@ public class EncodeAndDecode {
      * @return 返回Bitmap类型的图拍你
      */
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public static Bitmap decodeBase64ToImage(String imgData) {  //对字节数组字符串进行Base64解码并生成图片
+    public static Bitmap base64ToImage(String imgData) {  //对字节数组字符串进行Base64解码并生成图片
         //图像数据为空
         if (imgData == null) {
             return null;
