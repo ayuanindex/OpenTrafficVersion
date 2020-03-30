@@ -75,7 +75,7 @@ public class CameraSettingActivity extends BaseActivity implements View.OnClickL
     protected void initData() {
         // 拿到最后一次连接成功的IP和端口号
         camera_ip = SpUtil.getString("camera_ip", "192.168.1.1");
-        camera_port = SpUtil.getInt("camera_port", 4567);
+        camera_port = SpUtil.getInt("camera_port", 8527);
 
         // 回显最后一次连接的ip和port
         et_ip.setText(camera_ip);

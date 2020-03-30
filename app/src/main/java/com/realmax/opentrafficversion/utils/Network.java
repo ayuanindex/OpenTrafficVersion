@@ -1,7 +1,6 @@
 package com.realmax.opentrafficversion.utils;
 
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.Log;
 
@@ -74,13 +73,13 @@ public class Network {
      * @return
      */
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public static <T> void getORCString(Drawable drawable, String URL, Class<T> tClass, ResultData<? super T> resultData) {
+    public static <T> void getORCString(Bitmap bitmap, String URL, Class<T> tClass, ResultData<? super T> resultData) {
         new Thread() {
             @Override
             public void run() {
                 super.run();
                 try {
-                    Bitmap bitmap = EncodeAndDecode.drawableToBitmap(drawable);
+                    /*Bitmap bitmap = EncodeAndDecode.drawableToBitmap(drawable);*/
                     String bitmapToBase64 = bitmapToBase64(bitmap);
                     String imgParam = URLEncoder.encode(bitmapToBase64, "UTF-8");
                     String param = "image=" + imgParam;

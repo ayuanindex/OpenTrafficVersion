@@ -75,7 +75,7 @@ public class ControlSettingActivity extends BaseActivity implements View.OnClick
     protected void initData() {
         // 拿到最后一次连接成功的IP和端口号
         remote_ip = SpUtil.getString("remote_ip", "192.168.1.1");
-        remote_port = SpUtil.getInt("remote_port", 8527);
+        remote_port = SpUtil.getInt("remote_port", 4567);
 
         // 回显最后一次连接的ip和port
         et_ip.setText(remote_ip);

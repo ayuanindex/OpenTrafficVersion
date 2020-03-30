@@ -2,7 +2,7 @@ package com.realmax.opentrafficversion.activity;
 
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.cardview.widget.CardView;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -27,6 +28,7 @@ import com.realmax.opentrafficversion.R;
 import com.realmax.opentrafficversion.Values;
 import com.realmax.opentrafficversion.bean.ButtonBean;
 import com.realmax.opentrafficversion.bean.CameraBodyBean;
+import com.realmax.opentrafficversion.bean.CurrentCameraBean;
 import com.realmax.opentrafficversion.bean.ORCBean;
 import com.realmax.opentrafficversion.bean.ViolateBean;
 import com.realmax.opentrafficversion.dao.OrmHelper;
@@ -69,7 +71,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
     private int count = 0;
 
     /**
-     * 当前识别到的车牌号
+     * 当前识别到违章车辆到摄像头
      */
     private int currentCamera = -1;
 
@@ -113,16 +115,24 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                     tv_measure.setText(message);
                     tv_tips.setText("");
                     break;
-                case 1:
+                /*case 1:
                     // 进行车牌号识别
                     orcNumberPlate();
-                    break;
+                    break;*/
             }
         }
     };
     private OrmHelper ormHelper;
     private Dao<ViolateBean, ?> violateDao;
     private ChannelHandlerContext handlerContext;
+    private ImageView iv_violate_image;
+    private CardView cd_view;
+    private Button btn_violation_view;
+    /**
+     * 当前拍摄到违章的摄像头编号
+     */
+    private int violateCamera;
+    private ArrayList<CurrentCameraBean> violateBitmap;
 
     @Override
     protected int getLayoutId() {
@@ -144,6 +154,26 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
         btn_back = (Button) findViewById(R.id.btn_back);
         btn_back.setOnClickListener(this);
         gv_btns = (GridView) findViewById(R.id.gv_btns);
+        iv_violate_image = (ImageView) findViewById(R.id.iv_violate_image);
+        iv_violate_image.setOnClickListener(this);
+        cd_view = (CardView) findViewById(R.id.cd_view);
+        cd_view.setOnClickListener(this);
+        btn_violation_view = (Button) findViewById(R.id.btn_violation_view);
+        btn_violation_view.setOnClickListener(this);
+
+        // 获取源图片的宽高算出宽高比
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        BitmapFactory.decodeResource(getResources(), R.drawable.weizhang, options);
+        int outHeight = options.outHeight;
+        int outWidth = options.outWidth;
+        float i = (float) outHeight / (float) outWidth;
+
+        // 通过宽高比设置carView的宽高
+        cd_view.setContentPadding(10, 10, 10, 10);
+        ViewGroup.LayoutParams cardParams = cd_view.getLayoutParams();
+        cardParams.width = 220;
+        cardParams.height = (int) (200 * i);
+        cd_view.setLayoutParams(cardParams);
     }
 
     @Override
@@ -175,6 +205,8 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
 
         // 初始化违章车辆集合
         violateBeans = new ArrayList<>();
+        // 违章照片集合
+        violateBitmap = new ArrayList<>();
 
         new Thread() {
             @Override
@@ -222,7 +254,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
             public void getResultData(String msg) {
                 try {
                     JSONObject jsonObject = new JSONObject(msg);
-                    checkedPosition = jsonObject.optInt("id") - 1;
+                    checkedPosition = jsonObject.optInt("id");
                     Log.i(TAG, "getResultData: " + checkedPosition);
                     violate();
                 } catch (JSONException e) {
@@ -262,15 +294,16 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
      * 获取违章拍摄的摄像头
      */
     private void violate() {
-        if (checkedPosition >= 0 && checkedPosition <= 7) {
+        if (checkedPosition >= 1 && checkedPosition <= 8) {
             for (int i = 0; i < buttonNames.size(); i++) {
                 int currentId = buttonNames.get(i).getId();
-                if (currentId == checkedPosition + 1) {
+                if (currentId == checkedPosition) {
                     checkedPosition = i;
                     currentCamera = buttonNames.get(i).getId();
                     break;
                 }
             }
+
 
             // 刷新按钮位置
             runOnUiThread(new Runnable() {
@@ -278,8 +311,9 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                 public void run() {
                     // 刷新按钮位置
                     customerAdapter.notifyDataSetChanged();
-                    tv_measure.setVisibility(View.VISIBLE);
                     tv_measure.setText(buttonNames.get(checkedPosition).getName() + "抓拍，百度云测算中……");
+                    // 设置可拍照
+                    isBeat = true;
                 }
             });
         } else {
@@ -297,34 +331,27 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
         CameraBodyBean imageBodyBean = getImageBodyBean(msg);
         if (imageBodyBean != null) {
             Bitmap bitmap = EncodeAndDecode.base64ToImage(imageBodyBean.getCameraImg());
+
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     iv_snap_shot.setImageBitmap(bitmap);
+
+                    // 判断当前返回的数据是不是拍摄到违章画面的摄像头
+                    if (imageBodyBean.getCameraNum() == currentCamera && isBeat) {
+                        iv_violate_image.setImageBitmap(bitmap);
+                        Log.i(TAG, "run: 开始执行拍照");
+                        isBeat = false;
+                        violateBitmap.add(new CurrentCameraBean(bitmap, checkedPosition));
+
+                        if (flag) {
+                            flag = false;
+                            orcNumberPlate();
+                        }
+                    }
                 }
             });
         }
-        /*if (!isBeat) {
-            CameraBodyBean imageData = cameraTCPLink.getImageData(cameraTCPLink.getJson());
-            if (imageData != null) {
-                Bitmap bitmap = EncodeAndDecode.base64ToImage(imageData.getCameraImg());
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        iv_snap_shot.setImageBitmap(bitmap);
-                        if (imageData.getCameraNum() == currentCamera) {
-                            Log.i(TAG, "run: 发送拍照指令");
-                            currentCamera = -1;
-                            isBeat = true;
-                            // 发送消息，通知其准备好进行识别
-                            Message obtain = Message.obtain();
-                            obtain.what = 1;
-                            handler.sendMessage(obtain);
-                        }
-                    }
-                });
-            }
-        }*/
     }
 
     /**
@@ -348,6 +375,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
             Log.i(TAG, "getImageData: 出现异常：" + substring);
             getImageBodyBean(substring);
         }
+
         return null;
     }
 
@@ -360,38 +388,50 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
             @Override
             public void run() {
                 super.run();
-                // 获取当前的违章图片
-                Drawable drawable = iv_snap_shot.getDrawable();
-                // 通过百度云提供的工具类来联网识别当前照片中的车牌号
-                Network.getORCString(drawable, Values.LICENSE_PLATE_ORC_URL, ORCBean.class, new Network.ResultData<ORCBean>() {
+                Message message = Message.obtain();
+                if (violateBitmap.size() <= 0) {
+                    Log.d(TAG, "run: 识别完毕");
+                    flag = true;
+                    return;
+                }
+
+                CurrentCameraBean currentCameraBean = violateBitmap.get(0);
+                Network.getORCString(currentCameraBean.getBitmap(), Values.LICENSE_PLATE_ORC_URL, ORCBean.class, new Network.ResultData<ORCBean>() {
                     @Override
                     public void result(ORCBean orcBean) {
-                        // 继续识别
-                        isBeat = false;
-                        String camera = buttonNames.get(checkedPosition).getName();
-                        Message message = Message.obtain();
-
+                        String camera = buttonNames.get(currentCameraBean.getCameraPostion()).getName();
                         if (orcBean != null) {
+                            Log.i(TAG, "result: 识别成功");
                             // 创建当前监控车辆对象的容器
                             ViolateBean obj = null;
                             String numberPlate = orcBean.getWords_result().getNumber();
 
-                            // 当前拍摄的车辆
+                            // 找出当前车辆之前是否有过违章记录
                             for (ViolateBean violateBean : violateBeans) {
                                 if (violateBean.getNumberPlate().equals(numberPlate)) {
                                     obj = violateBean;
+                                    Log.d(TAG, "result: 找到对应车辆");
                                     break;
                                 }
                             }
 
-                            if (checkedPosition >= 0 && checkedPosition <= 3) {//0、1、2、3
+                            // 判断是否为A1，B1，C1，D1进行拍摄
+                            if (currentCameraBean.getCameraPostion() >= 0 && currentCameraBean.getCameraPostion() <= 3) {//0、1、2、3
+                                Log.d(TAG, "result: 判定为为A1B1C1D1压线");
+                                // 判断是否在以前的违章记录中找到了次车辆
                                 if (obj == null) {
                                     ViolateBean e = new ViolateBean(camera, numberPlate, 0, true);
+                                    // 未找到将其添加进违章记录集合
                                     violateBeans.add(e);
+                                    // 添加至数据库中
                                     ViolateDaoUtil.add(e);
+                                    Log.d(TAG, "result: 找到了之前的记录");
                                 } else {
+                                    // 找到此车辆之前的违章记录，更新当前车辆违章记录的次数
                                     obj.updateViolate(camera);
+                                    // 更新数据库中车辆违章的次数
                                     ViolateDaoUtil.updateToCamera(obj);
+                                    Log.d(TAG, "result: 未找到之前的记录");
                                 }
 
                                 runOnUiThread(new Runnable() {
@@ -402,10 +442,14 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                                         tv_tips.setText("车牌号:" + numberPlate + "，违章：判定压线");
                                     }
                                 });
-                            } else if (checkedPosition >= 4 && checkedPosition <= 7) {//4、5、6、7
+                            } else if (currentCameraBean.getCameraPostion() >= 4 && currentCameraBean.getCameraPostion() <= 7) {//判断是否为A2，B2，C2，D2抓拍的
+                                Log.d(TAG, "result: 判定为闯红灯");
+                                // 当找到此车辆之前的压线记录｜闯红灯记录
                                 if (obj != null) {
-                                    // 验证当前车辆是否闯红灯
+                                    Log.d(TAG, "result: 找到之前的记录" + camera);
+                                    // 验证当前车辆是否闯红灯（比如先被A1抓拍然后被A2抓拍，中间有压B1的线则重新开始判定）
                                     if (obj.ViolateCheck(camera, numberPlate)) {
+                                        // 判定为闯红灯，更新至数据库中闯红灯次数+1
                                         ViolateDaoUtil.updateToCount(obj);
                                         ViolateBean finalObj = obj;
                                         runOnUiThread(new Runnable() {
@@ -418,6 +462,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                                         });
                                     }
                                 } else {
+                                    Log.d(TAG, "result: 没有找到之前的记录");
                                     runOnUiThread(new Runnable() {
                                         @SuppressLint("SetTextI18n")
                                         @Override
@@ -426,22 +471,41 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                                             tv_tips.setText("车牌号:" + numberPlate + "，违章：闯红灯，第1次拍照");
                                         }
                                     });
+                                    // 新的违章
                                     ViolateBean e = new ViolateBean("", numberPlate, 1, false);
+                                    // 设置第二次抓拍到的摄像头
                                     e.setCamera_two(camera);
+                                    // 添加进集合
                                     violateBeans.add(e);
+                                    // 添加到数据库中
                                     ViolateDaoUtil.add(e);
                                 }
                             }
+
+                            // 从集合中删除图片
+                            violateBitmap.remove(0);
                         } else {
+                            // 识别失败，删除照片
+                            violateBitmap.remove(0);
                             message.obj = camera + "抓拍，百度云测算失败！";
                             message.what = 0;
                             handler.sendMessage(message);
                         }
+
+
+                        // 重新调用此方法继续识别图片集合中的违章车牌
+                        orcNumberPlate();
                     }
 
                     @Override
                     public void error() {
+                        message.obj = "抓拍，百度云测算失败！";
+                        message.what = 0;
+                        handler.sendMessage(message);
 
+                        violateBitmap.remove(0);
+                        // 重新调用此方法继续识别图片集合中的违章车牌
+                        orcNumberPlate();
                     }
                 });
             }
@@ -475,6 +539,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                 view = convertView;
             }
             initView(view);
+
             // 设置按钮显示的文字
             cbCamera.setText(getItem(position).getName());
             // 设置按钮的默认选中状态
@@ -521,6 +586,8 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
         switch (v.getId()) {
             case R.id.btn_back:
                 finish();
+                break;
+            case R.id.btn_violation_view:
                 break;
         }
     }

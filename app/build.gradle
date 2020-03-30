@@ -52,4 +52,5 @@ dependencies {
     implementation 'com.trello.rxlifecycle3:rxlifecycle-components:3.1.0'
     implementation files('libs/ormlite-android-5.1.jar')
     implementation files('libs/ormlite-core-5.1.jar')
+    implementation 'androidx.cardview:cardview:1.0.0'
 }

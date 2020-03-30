@@ -1,7 +1,5 @@
 package com.realmax.opentrafficversion.utils;
 
-import android.util.Log;
-
 import com.realmax.opentrafficversion.impl.CustomerCallback;
 
 import java.nio.charset.StandardCharsets;
@@ -30,7 +28,7 @@ public abstract class NettyHandler extends SimpleChannelInboundHandler<ByteBuf> 
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, ByteBuf msg) throws Exception {
-        Log.i(TAG, "channelRead0: client channelRead..哈哈哈");
+        /*Log.i(TAG, "channelRead0: client channelRead..哈哈哈");*/
         ByteBuf buf = msg.readBytes(msg.readableBytes());
         String s = buf.toString(StandardCharsets.US_ASCII);
         /*String s = buf.toString(StandardCharsets.UTF_8)*/;
@@ -39,6 +37,7 @@ public abstract class NettyHandler extends SimpleChannelInboundHandler<ByteBuf> 
             if (c == left) {
                 // 设置flag标记，将开始记录数据
                 flag = true;
+                strings = new StringBuffer();
             }
             if (flag) {
                 // 通过stringBuilder来拼接字符串
