@@ -96,11 +96,16 @@ public class ViolateCarBean {
         return rootPath + createTime.getTime() + ".png";
     }
 
+    public String getImgPath() {
+        return lastImagePath;
+    }
+
     public void setLastImagePath(String lastImagePath) {
         this.lastImagePath = lastImagePath;
     }
 
     public Date getCreateTime() {
+
         return createTime;
     }
 

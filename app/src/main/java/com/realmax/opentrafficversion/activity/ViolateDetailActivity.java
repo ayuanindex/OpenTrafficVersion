@@ -54,50 +54,21 @@ public class ViolateDetailActivity extends BaseActivity {
         OpenTrafficQueryDao.queryForAll(violateCarBeans, new OpenTrafficQueryDao.Result() {
             @Override
             public void success(Object object) {
-                ArrayList<ViolateCarBean> obj = (ArrayList<ViolateCarBean>) object;
-                for (ViolateCarBean violateCarBean : obj) {
+                for (ViolateCarBean violateCarBean : violateCarBeans) {
                     fragments.add(new ViolateFragment(violateCarBean));
                 }
 
                 runOnUiThread(new Runnable() {
-                    private CustomerAdapter customerAdapter;
-
                     @Override
                     public void run() {
-                        customerAdapter = new CustomerAdapter(getSupportFragmentManager());
+                        CustomerAdapter customerAdapter = new CustomerAdapter(getSupportFragmentManager());
                         vp_pager.setAdapter(customerAdapter);
+                        vp_pager.setOffscreenPageLimit(10);
+                        vp_pager.setPageMargin(300);
                     }
                 });
             }
         });
-
-       /* new Thread() {
-            @Override
-            public void run() {
-                super.run();
-                try {
-                    OrmHelper instance = OrmHelper.getInstance();
-                    Dao<ViolateBean, ?> violateBeanDao = instance.getDao(ViolateBean.class);
-                    violateBeans = violateBeanDao.queryForAll();
-                    for (ViolateBean violateBean : violateBeans) {
-                        *//*fragments.add(new ViolateFragment(violateBean));*//*
-                    }
-
-                    runOnUiThread(new Runnable() {
-
-                        private CustomerAdapter customerAdapter;
-
-                        @Override
-                        public void run() {
-                            customerAdapter = new CustomerAdapter(getSupportFragmentManager());
-                            vp_pager.setAdapter(customerAdapter);
-                        }
-                    });
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();*/
     }
 
     class CustomerAdapter extends FragmentStatePagerAdapter {

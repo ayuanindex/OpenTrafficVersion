@@ -28,6 +28,7 @@ public class Values {
     public static final int REQUEST_TIME = 30;
 
     public final static String BASE_URL = "https://aip.baidubce.com/";
+    public final static String BASE_URL_IMG = "https://aip.baidubce.com/upload/";
 
     /**
      * 通用文字识别

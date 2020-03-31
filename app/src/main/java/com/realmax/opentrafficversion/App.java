@@ -12,6 +12,8 @@ import androidx.fragment.app.FragmentActivity;
 import com.google.gson.Gson;
 import com.realmax.opentrafficversion.utils.Network;
 
+import static com.realmax.opentrafficversion.Values.BASE_URL;
+
 public class App extends Application {
     private static ProgressDialog progressDialog;
     private static Gson gson;
@@ -26,7 +28,7 @@ public class App extends Application {
         gson = new Gson();
         context = this;
         toast = Toast.makeText(context, "", Toast.LENGTH_SHORT);
-        remote = Network.remote(ApiService.class);
+        remote = Network.remote(ApiService.class, BASE_URL);
     }
 
     public static Context getContext() {

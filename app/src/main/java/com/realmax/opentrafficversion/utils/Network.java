@@ -23,7 +23,6 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import static android.content.ContentValues.TAG;
-import static com.realmax.opentrafficversion.Values.BASE_URL;
 import static com.realmax.opentrafficversion.utils.EncodeAndDecode.bitmapToBase64;
 
 /**
@@ -33,7 +32,7 @@ public class Network {
     private static Retrofit retrofit;
 
     // 构建一个Retrofit
-    private static Retrofit getRetrofit() {
+    private static Retrofit getRetrofit(String baseUrl) {
         if (retrofit != null)
             return retrofit;
 
@@ -43,7 +42,7 @@ public class Network {
                 .connectTimeout(Values.REQUEST_TIME, TimeUnit.SECONDS)
                 .build();
 
-        retrofit = new Retrofit.Builder().baseUrl(BASE_URL)
+        retrofit = new Retrofit.Builder().baseUrl(baseUrl)
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create(App.getGson()))
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
@@ -57,8 +56,8 @@ public class Network {
      *
      * @return
      */
-    public static <T> T remote(Class<T> clazz) {
-        return Network.getRetrofit().create(clazz);
+    public static <T> T remote(Class<T> clazz, String baseUrl) {
+        return Network.getRetrofit(baseUrl).create(clazz);
     }
 
     public interface ResultData<T> {

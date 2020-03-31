@@ -1,11 +1,12 @@
 package com.realmax.opentrafficversion;
 
-import com.realmax.opentrafficversion.bean.ORCBean;
 import com.realmax.opentrafficversion.bean.TokenBean;
 
 import io.reactivex.Observable;
+import okhttp3.ResponseBody;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
+import retrofit2.http.Url;
 
 /**
  * @ProjectName: BaiduApiTest
@@ -21,9 +22,7 @@ public interface ApiService {
             @Query("client_secret") String client_secret
     );
 
-    @GET("rest/2.0/ocr/v1/general_basic")
-    Observable<ORCBean> getORCString(
-            @Query("image") String image,
-            @Query("access_token") String access_token
-    );
+
+    @GET
+    Observable<ResponseBody> getImg(@Url String url);
 }

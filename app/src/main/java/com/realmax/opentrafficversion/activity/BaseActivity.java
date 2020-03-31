@@ -9,11 +9,11 @@ import android.util.Log;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.realmax.opentrafficversion.App;
 import com.realmax.opentrafficversion.Values;
 import com.realmax.opentrafficversion.bean.TokenBean;
+import com.trello.rxlifecycle3.components.support.RxAppCompatActivity;
 
 import java.net.Socket;
 
@@ -21,7 +21,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
-public abstract class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends RxAppCompatActivity {
     public final String TAG = this.getClass().getSimpleName();
     public static Socket remoteSocket = null;
     public static Socket cameraSocket = null;
@@ -84,6 +84,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     @SuppressLint("CheckResult")
     public void getTokenString() {
         App.getRemote().getToken(Values.GRANT_TYPE, Values.CLIENT_ID, Values.CLIENT_SECRET)
+                .compose(this.bindToLifecycle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<TokenBean>() {
