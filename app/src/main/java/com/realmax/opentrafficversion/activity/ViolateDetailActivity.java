@@ -9,15 +9,12 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
-import com.j256.ormlite.dao.Dao;
 import com.realmax.opentrafficversion.R;
 import com.realmax.opentrafficversion.bean.ViolateBean;
 import com.realmax.opentrafficversion.bean.ViolateCarBean;
 import com.realmax.opentrafficversion.dao.OpenTrafficQueryDao;
-import com.realmax.opentrafficversion.dao.OrmHelper;
 import com.realmax.opentrafficversion.fragment.ViolateFragment;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,10 +59,19 @@ public class ViolateDetailActivity extends BaseActivity {
                     fragments.add(new ViolateFragment(violateCarBean));
                 }
 
+                runOnUiThread(new Runnable() {
+                    private CustomerAdapter customerAdapter;
+
+                    @Override
+                    public void run() {
+                        customerAdapter = new CustomerAdapter(getSupportFragmentManager());
+                        vp_pager.setAdapter(customerAdapter);
+                    }
+                });
             }
         });
 
-        new Thread() {
+       /* new Thread() {
             @Override
             public void run() {
                 super.run();
@@ -74,7 +80,7 @@ public class ViolateDetailActivity extends BaseActivity {
                     Dao<ViolateBean, ?> violateBeanDao = instance.getDao(ViolateBean.class);
                     violateBeans = violateBeanDao.queryForAll();
                     for (ViolateBean violateBean : violateBeans) {
-                        /*fragments.add(new ViolateFragment(violateBean));*/
+                        *//*fragments.add(new ViolateFragment(violateBean));*//*
                     }
 
                     runOnUiThread(new Runnable() {
@@ -91,7 +97,7 @@ public class ViolateDetailActivity extends BaseActivity {
                     e.printStackTrace();
                 }
             }
-        }.start();
+        }.start();*/
     }
 
     class CustomerAdapter extends FragmentStatePagerAdapter {

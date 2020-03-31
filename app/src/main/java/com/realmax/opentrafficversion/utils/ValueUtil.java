@@ -1,9 +1,12 @@
 package com.realmax.opentrafficversion.utils;
 
+import com.realmax.opentrafficversion.bean.ViolateCarBean;
 import com.realmax.opentrafficversion.impl.CameraHandler;
 import com.realmax.opentrafficversion.impl.CustomerCallback;
 import com.realmax.opentrafficversion.impl.RefreshData;
 import com.realmax.opentrafficversion.impl.RemoteHandler;
+
+import java.util.ArrayList;
 
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -32,6 +35,8 @@ public class ValueUtil {
 
     private static CameraHandler cameraHandler;
     private static RemoteHandler remoteHandler;
+
+    private static ArrayList<ViolateCarBean> violateCarBeans;
     /**
      * Netty提供的发送数据的类
      */
@@ -101,6 +106,14 @@ public class ValueUtil {
         ValueUtil.remoteHandler = remoteHandler;
     }
 
+    public static ArrayList<ViolateCarBean> getViolateCarBeans() {
+        return violateCarBeans;
+    }
+
+    public static void setViolateCarBeans(ArrayList<ViolateCarBean> violateCarBeans) {
+        ValueUtil.violateCarBeans = violateCarBeans;
+    }
+
     public static ChannelHandlerContext getHandlerContext() {
         return handlerContext;
     }
@@ -112,8 +125,8 @@ public class ValueUtil {
     /**
      * 发送获取摄像头摄像数据的指令
      *
-     * @param deviceType  摄像头的设备ID
-     * @param cameraNum 摄像头编号
+     * @param deviceType 摄像头的设备ID
+     * @param cameraNum  摄像头编号
      */
     public static void sendCameraCmd(String deviceType, int cameraNum) {
         if (handlerContext == null) {

@@ -1,5 +1,6 @@
 package com.realmax.opentrafficversion.bean;
 
+import android.graphics.Bitmap;
 import android.text.TextUtils;
 
 import com.realmax.opentrafficversion.dao.OpenTrafficQueryDao;
@@ -9,7 +10,6 @@ import java.util.Date;
 import java.util.Objects;
 
 public class ViolateCarBean {
-    private String rootPath = "http://driving.zuto360.com/upload/";
     private String camera_one;
     private String camera_two;
     private String numberPlate;
@@ -18,6 +18,7 @@ public class ViolateCarBean {
     private Date createTime;
     private boolean isViolate;
     private String des;
+    private Bitmap violateBitmap;
 
     public ViolateCarBean() {
     }
@@ -30,13 +31,14 @@ public class ViolateCarBean {
         this.isViolate = isViolate;
     }
 
-    public ViolateCarBean(String camera_one, String camera_two, String numberPlate, int violateCount, boolean isViolate, String des, Date createTime) {
+    public ViolateCarBean(String camera_one, String camera_two, String numberPlate, int violateCount, boolean isViolate, String des, Bitmap violateBitmap, Date createTime) {
         this.camera_one = camera_one;
         this.camera_two = camera_two;
         this.numberPlate = numberPlate;
         this.violateCount = violateCount;
         this.isViolate = isViolate;
         this.des = des;
+        this.violateBitmap = violateBitmap;
         this.createTime = createTime;
 
         // 添加至数据库中
@@ -90,6 +92,7 @@ public class ViolateCarBean {
     }
 
     public String getLastImagePath() {
+        String rootPath = "http://driving.zuto360.com/upload/";
         return rootPath + createTime.getTime() + ".png";
     }
 
@@ -119,6 +122,14 @@ public class ViolateCarBean {
 
     public void setDes(String des) {
         this.des = des;
+    }
+
+    public Bitmap getViolateBitmap() {
+        return violateBitmap;
+    }
+
+    public void setViolateBitmap(Bitmap violateBitmap) {
+        this.violateBitmap = violateBitmap;
     }
 
     /**

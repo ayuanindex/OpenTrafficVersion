@@ -194,6 +194,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
         iv_violate_image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ValueUtil.setViolateCarBeans(violateCarBeans);
                 jump(ViolateDetailActivity.class);
             }
         });
@@ -201,6 +202,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
         btn_violation_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ValueUtil.setViolateCarBeans(violateCarBeans);
                 jump(ViolateDetailActivity.class);
             }
         });
@@ -242,26 +244,6 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                 monitor();
             }
         });
-
-        /*new Thread() {
-            @Override
-            public void run() {
-                super.run();
-                try {
-                    // 获取数据库对象
-                    ormHelper = OrmHelper.getInstance();
-                    // 获取Dao
-                    violateDao = ormHelper.getDao(ViolateBean.class);
-                    // 获取所有的数据
-                    violateBeans = violateDao.queryForAll();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();*/
-
-        /*cameraTCPLink = new TCPLinks(cameraSocket);
-        remoteTCPLink = new TCPLinks(remoteSocket);*/
 
         handlerContext = CameraHandler.getHandlerContext();
         ValueUtil.setHandlerContext(handlerContext);
@@ -457,6 +439,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                                 if (violateCarBean.getNumberPlate().equals(numberPlate)) {
                                     obj = violateCarBean;
                                     obj.setCreateTime(createTime);
+                                    obj.setViolateBitmap(bitmap);
                                     L.e("找到对应车辆");
                                     break;
                                 }
@@ -468,7 +451,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                                 // 判断是否在以前的违章记录中找到了次车辆
                                 if (obj == null) {
                                     L.e("未找到之前的记录");
-                                    ViolateCarBean e = new ViolateCarBean(camera, "", numberPlate, 0, true, "判定压线", createTime);
+                                    ViolateCarBean e = new ViolateCarBean(camera, "", numberPlate, 0, true, "判定压线", bitmap, createTime);
                                     // 未找到将其添加进违章记录集合
                                     violateCarBeans.add(e);
                                 } else {
@@ -514,7 +497,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                                         }
                                     });
                                     // 新的违章
-                                    ViolateCarBean e = new ViolateCarBean("", camera, numberPlate, 1, false, "判定闯红灯", createTime);
+                                    ViolateCarBean e = new ViolateCarBean("", camera, numberPlate, 1, false, "判定闯红灯", bitmap, createTime);
                                     // 添加进集合
                                     violateCarBeans.add(e);
                                 }
