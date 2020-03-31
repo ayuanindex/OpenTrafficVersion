@@ -25,6 +25,9 @@ android {
         targetCompatibility = 1.8
     }
 
+    packagingOptions {
+        exclude 'META-INF/INDEX.LIST'
+    }
 }
 
 dependencies {
@@ -34,7 +37,6 @@ dependencies {
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-
     // Netty
     implementation 'io.netty:netty-all:4.1.9.Final'
     //Gson
@@ -50,7 +52,11 @@ dependencies {
     implementation 'com.trello.rxlifecycle3:rxlifecycle:3.1.0'
     implementation 'com.trello.rxlifecycle3:rxlifecycle-android:3.1.0'
     implementation 'com.trello.rxlifecycle3:rxlifecycle-components:3.1.0'
+    // OrmLite数据库
     implementation files('libs/ormlite-android-5.1.jar')
     implementation files('libs/ormlite-core-5.1.jar')
+    // CarView
     implementation 'androidx.cardview:cardview:1.0.0'
+    implementation files('libs/mysql-connector-java-5.1.45-bin.jar')
+    implementation files('libs/commons-net-3.0.1.jar')
 }

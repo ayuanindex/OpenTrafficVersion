@@ -41,6 +41,11 @@
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name=".activity.ViolateDetailActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
     </application>
 
 </manifest>

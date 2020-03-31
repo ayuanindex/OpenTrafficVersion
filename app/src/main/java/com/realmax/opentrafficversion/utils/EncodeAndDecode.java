@@ -127,4 +127,19 @@ public class EncodeAndDecode {
         }
         return result;
     }
+
+    /*public static Bitmap getBitmapFromByte(byte[] temp) {
+        if (temp != null) {
+            return BitmapFactory.decodeByteArray(temp, 0, temp.length);
+        } else {
+            return null;
+        }
+    }*/
+
+    public static ByteArrayInputStream bitmapToByte(Bitmap bitmap) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        return new ByteArrayInputStream(baos.toByteArray());
+        /*return baos.toByteArray();*/
+    }
 }
