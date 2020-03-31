@@ -108,7 +108,7 @@ public class OpenTrafficQueryDao {
     public static void addToImg(Connection connection, Result result, ViolateCarBean violateCarBean) {
         try {
             String sql = "INSERT INTO images VALUES(" +
-                    "(SELECT id FROM violatetable WHERE numberplate=?),?,?,?)";
+                    "(SELECT car_id FROM violatetable WHERE numberplate=?),?,?,?)";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, violateCarBean.getNumberPlate());
             preparedStatement.setString(2, violateCarBean.getLastImagePath());
