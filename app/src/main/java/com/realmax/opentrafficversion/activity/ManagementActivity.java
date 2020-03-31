@@ -34,6 +34,7 @@ import com.realmax.opentrafficversion.bean.ViolateBean;
 import com.realmax.opentrafficversion.bean.ViolateCarBean;
 import com.realmax.opentrafficversion.dao.OpenTrafficQueryDao;
 import com.realmax.opentrafficversion.dao.OrmHelper;
+import com.realmax.opentrafficversion.ftp.FTPUtil;
 import com.realmax.opentrafficversion.impl.CameraHandler;
 import com.realmax.opentrafficversion.impl.CustomerCallback;
 import com.realmax.opentrafficversion.impl.RemoteHandler;
@@ -46,6 +47,8 @@ import com.realmax.opentrafficversion.utils.ValueUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -380,7 +383,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                         iv_violate_image.setImageBitmap(bitmap);
                         Log.i(TAG, "run: 开始执行拍照");
                         isBeat = false;
-                        violateBitmap.add(new CurrentCameraBean(bitmap, checkedPosition));
+                        violateBitmap.add(new CurrentCameraBean(bitmap, checkedPosition, new Date()));
 
                         if (flag) {
                             flag = false;
@@ -434,11 +437,16 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                 }
 
                 CurrentCameraBean currentCameraBean = violateBitmap.get(0);
-                Network.getORCString(currentCameraBean.getBitmap(), Values.LICENSE_PLATE_ORC_URL, ORCBean.class, new Network.ResultData<ORCBean>() {
+                Bitmap bitmap = currentCameraBean.getBitmap();
+                Network.getORCString(bitmap, Values.LICENSE_PLATE_ORC_URL, ORCBean.class, new Network.ResultData<ORCBean>() {
                     @Override
                     public void result(ORCBean orcBean) {
                         String camera = buttonNames.get(currentCameraBean.getCameraPostion()).getName();
                         if (orcBean != null) {
+                            Date createTime = currentCameraBean.getCreateTime();
+                            // 进行上传图片的操作
+                            uploadImg(createTime.getTime() + "", bitmap);
+
                             Log.i(TAG, "result: 识别成功");
                             // 创建当前监控车辆对象的容器
                             ViolateCarBean obj = null;
@@ -448,6 +456,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                             for (ViolateCarBean violateCarBean : violateCarBeans) {
                                 if (violateCarBean.getNumberPlate().equals(numberPlate)) {
                                     obj = violateCarBean;
+                                    obj.setCreateTime(createTime);
                                     L.e("找到对应车辆");
                                     break;
                                 }
@@ -459,12 +468,13 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                                 // 判断是否在以前的违章记录中找到了次车辆
                                 if (obj == null) {
                                     L.e("未找到之前的记录");
-                                    ViolateCarBean e = new ViolateCarBean(camera, "", numberPlate, 0, true, "判定压线", new Date());
+                                    ViolateCarBean e = new ViolateCarBean(camera, "", numberPlate, 0, true, "判定压线", createTime);
                                     // 未找到将其添加进违章记录集合
                                     violateCarBeans.add(e);
                                 } else {
                                     L.e("找到了之前的记录");
                                     // 找到此车辆之前的违章记录，更新当前车辆违章记录的次数
+                                    // 设置拍照时间
                                     obj.updateViolate(camera);
                                 }
 
@@ -504,7 +514,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                                         }
                                     });
                                     // 新的违章
-                                    ViolateCarBean e = new ViolateCarBean("", camera, numberPlate, 1, false, "判定闯红灯", new Date());
+                                    ViolateCarBean e = new ViolateCarBean("", camera, numberPlate, 1, false, "判定闯红灯", createTime);
                                     // 添加进集合
                                     violateCarBeans.add(e);
                                 }
@@ -540,6 +550,22 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
         }.start();
     }
 
+    private void uploadImg(String createTime, Bitmap bitmap) {
+        FTPUtil.compressImage(bitmap, createTime, new FTPUtil.Result() {
+            @Override
+            public void success(File file) throws IOException {
+                FTPUtil ftpUtil = new FTPUtil();
+                boolean b = ftpUtil.openConnect();
+                boolean uploading = ftpUtil.uploading(file, createTime);
+                if (uploading) {
+                    if (file != null) {
+                        file.delete();
+                    }
+                }
+                L.e("上传状态：" + uploading);
+            }
+        });
+    }
 
     /**
      * 对车牌号进行识别

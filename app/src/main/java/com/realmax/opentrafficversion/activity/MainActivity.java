@@ -1,7 +1,11 @@
 package com.realmax.opentrafficversion.activity;
 
+import android.Manifest;
+import android.os.Build;
 import android.view.View;
 import android.widget.Button;
+
+import androidx.annotation.RequiresApi;
 
 import com.realmax.opentrafficversion.R;
 import com.realmax.opentrafficversion.dao.OrmHelper;
@@ -32,9 +36,37 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void initData() {
+        // 请求必要权限
+        requestPermissions(new String[]{
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.MOUNT_UNMOUNT_FILESYSTEMS
+        }, 0);
 
+        /*new Thread() {
+            @Override
+            public void run() {
+                super.run();
+                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.weizhang);
+                FTPUtil.compressImage(bitmap, "d", new FTPUtil.Result() {
+                    @Override
+                    public void success(File file) throws IOException {
+                        FTPUtil ftpUtil = new FTPUtil();
+                        boolean b = ftpUtil.openConnect();
+                        boolean uploading = ftpUtil.uploading(file, "d");
+                        if (uploading) {
+                            if (file != null) {
+                                file.delete();
+                            }
+                        }
+                        L.e("5" + uploading);
+                    }
+                });
+            }
+        }.start();*/
     }
 
     @Override

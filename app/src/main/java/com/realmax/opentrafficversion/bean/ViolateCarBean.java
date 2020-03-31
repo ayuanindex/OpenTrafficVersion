@@ -90,7 +90,7 @@ public class ViolateCarBean {
     }
 
     public String getLastImagePath() {
-        return rootPath + createTime.getTime();
+        return rootPath + createTime.getTime() + ".png";
     }
 
     public void setLastImagePath(String lastImagePath) {
@@ -147,7 +147,6 @@ public class ViolateCarBean {
         // 停止继续验证此车辆
         this.isViolate = false;
         this.des = "判定闯红灯";
-        this.createTime = new Date();
         // 判定为闯红灯，更新至数据库中闯红灯次数+1
         OpenTrafficQueryDao.updateViolateCountByNumberPlate(this, camera, new OpenTrafficQueryDao.Result() {
             @Override
@@ -166,7 +165,6 @@ public class ViolateCarBean {
         this.camera_one = camera;
         // 开始验证此车辆
         this.isViolate = true;
-        this.createTime = new Date();
         this.des = "判定压线";
         // 更新数据库中车辆违章的次数
         OpenTrafficQueryDao.updateCameraOneByNumberPlate(this, camera, new OpenTrafficQueryDao.Result() {
