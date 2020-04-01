@@ -46,9 +46,9 @@ public class OpenTrafficQueryDao {
                                 resultSet.getString("camera_two"),
                                 resultSet.getString("numberplate"),
                                 resultSet.getInt("violatecount"),
+                                resultSet.getString("violatedetail"),
                                 resultSet.getString("lastimagepath"),
-                                simpleDateFormat.parse(resultSet.getString("create_time"))
-                        ));
+                                simpleDateFormat.parse(resultSet.getString("create_time"))));
                     }
                     result.success(violateCarBeans);
                     DBOpenHelper.closeAll(preparedStatement, resultSet);
@@ -77,16 +77,18 @@ public class OpenTrafficQueryDao {
                             "camera_two," +
                             "numberplate," +
                             "violatecount," +
+                            "violatedetail," +
                             "lastimagepath," +
                             "create_time" +
-                            ") values (?,?,?,?,?,?);";
+                            ") values (?,?,?,?,?,?,?);";
                     PreparedStatement preparedStatement = drivingConn.prepareStatement(sql);
                     preparedStatement.setString(1, violateCarBean.getCamera_one());
                     preparedStatement.setString(2, violateCarBean.getCamera_two());
                     preparedStatement.setString(3, violateCarBean.getNumberPlate());
                     preparedStatement.setInt(4, violateCarBean.getViolateCount());
-                    preparedStatement.setString(5, violateCarBean.getLastImagePath());
-                    preparedStatement.setString(6, simpleDateFormat.format(violateCarBean.getCreateTime()));
+                    preparedStatement.setString(5, violateCarBean.getDes());
+                    preparedStatement.setString(6, violateCarBean.getLastImagePath());
+                    preparedStatement.setString(7, simpleDateFormat.format(violateCarBean.getCreateTime()));
                     int i = preparedStatement.executeUpdate();
                     result.success(i);
                     DBOpenHelper.closeAll(preparedStatement);
@@ -136,15 +138,16 @@ public class OpenTrafficQueryDao {
                 super.run();
                 try {
                     Connection drivingConn = DBOpenHelper.getDrivingConn();
-                    String sql = "update violatetable set violatecount=?,camera_two=?,create_time=? where numberplate=?";
+                    String sql = "update violatetable set violatecount=?,camera_two=?,create_time=?,violatedetail=? where numberplate=?";
                     PreparedStatement preparedStatement = drivingConn.prepareStatement(sql);
                     // 更新次数
                     preparedStatement.setInt(1, violateCarBean.getViolateCount());
                     // 更新第二个摄像头·
                     preparedStatement.setString(2, camera);
                     preparedStatement.setString(3, simpleDateFormat.format(violateCarBean.getCreateTime()));
+                    preparedStatement.setString(4, violateCarBean.getDes());
                     // 条件
-                    preparedStatement.setString(4, violateCarBean.getNumberPlate());
+                    preparedStatement.setString(5, violateCarBean.getNumberPlate());
                     int i = preparedStatement.executeUpdate();
                     result.success(i);
                     DBOpenHelper.closeAll(preparedStatement);
@@ -170,11 +173,12 @@ public class OpenTrafficQueryDao {
                 super.run();
                 try {
                     Connection drivingConn = DBOpenHelper.getDrivingConn();
-                    String sql = "update violatetable set camera_one=?,create_time=? where numberplate=?";
+                    String sql = "update violatetable set camera_one=?,create_time=?,violatedetail=? where numberplate=?";
                     PreparedStatement preparedStatement = drivingConn.prepareStatement(sql);
                     preparedStatement.setString(1, camera);
                     preparedStatement.setString(2, simpleDateFormat.format(violateCarBean.getCreateTime()));
-                    preparedStatement.setString(3, violateCarBean.getNumberPlate());
+                    preparedStatement.setString(3, violateCarBean.getDes());
+                    preparedStatement.setString(4, violateCarBean.getNumberPlate());
                     int i = preparedStatement.executeUpdate();
                     result.success(i);
                     DBOpenHelper.closeAll(preparedStatement);

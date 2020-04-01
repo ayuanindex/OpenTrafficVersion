@@ -50,11 +50,12 @@ public class ViolateCarBean {
         });
     }
 
-    public ViolateCarBean(String camera_one, String camera_two, String numberPlate, int violateCount, String lastImagePath, Date createTime) {
+    public ViolateCarBean(String camera_one, String camera_two, String numberPlate, int violateCount, String des, String lastImagePath, Date createTime) {
         this.camera_one = camera_one;
         this.camera_two = camera_two;
         this.numberPlate = numberPlate;
         this.violateCount = violateCount;
+        this.des = des;
         this.lastImagePath = lastImagePath;
         this.createTime = createTime;
     }
