@@ -54,37 +54,6 @@ public class NettyLinkUtil {
         }
     }
 
-    /*public void start(Callback status) throws Exception {
-        EventLoopGroup eventLoopGroup = new NioEventLoopGroup();
-        try {
-            Bootstrap b = new Bootstrap();
-            b.group(eventLoopGroup) // 注册线程池
-                    .channel(NioSocketChannel.class) // 使用NioSocketChannel来作为连接用的channel类
-                    .remoteAddress(new InetSocketAddress(this.HOST, this.PORT)) // 绑定连接端口和host信息
-                    .handler(new ChannelInitializer<SocketChannel>() { // 绑定连接初始化器
-                        @Override
-                        protected void initChannel(SocketChannel ch) throws Exception {
-                            Log.d(TAG, "initChannel: connected...");
-                            ch.pipeline().addLast(new NettyHandler(callback));
-                        }
-                    });
-            Log.d(TAG, "start: created..");
-
-
-            ChannelFuture cf = b.connect().sync(); // 异步连接服务器
-            Log.d(TAG, "start: connected..."); // 连接完成
-            callback.success(eventLoopGroup);
-            status.success();
-
-            cf.channel().closeFuture().sync(); // 异步等待关闭连接channel
-            Log.d(TAG, "start: closed.."); // 关闭完成
-            callback.disConnected();
-            status.error();
-        } finally {
-            eventLoopGroup.shutdownGracefully().sync(); // 释放线程池资源
-        }
-    }*/
-
     public interface Callback {
         void success(EventLoopGroup eventLoopGroup);
 

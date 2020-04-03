@@ -27,23 +27,7 @@ public class ControlSettingActivity extends BaseActivity implements View.OnClick
     private Button btn_back;
     private String remote_ip;
     private int remote_port;
-    /*private Handler handler = new Handler() {
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
-            int what = msg.what;
-            switch (what) {
-                case 0:
-                    cameraSocket = (Socket) msg.obj;
-                    App.showToast("连接成功");
-                    break;
-                case 1:
-                    App.showToast("连接失败");
-                    break;
-            }
-        }
-    };*/
-    /*private TCPLinks cameraTcp;*/
+
 
     @Override
     protected int getLayoutId() {
@@ -58,7 +42,7 @@ public class ControlSettingActivity extends BaseActivity implements View.OnClick
         btn_connected = (Button) findViewById(R.id.btn_connected);
         btn_back = (Button) findViewById(R.id.btn_back);
 
-        iv_logo.setImageResource(R.drawable.pic_camera);
+        iv_logo.setImageResource(R.drawable.pic_control);
     }
 
     @Override
@@ -165,49 +149,13 @@ public class ControlSettingActivity extends BaseActivity implements View.OnClick
                 }
             }.start();
         }
-        /*App.showToast("正在连接");
 
-        // 判断进入当前界面后最新输入的ip或端口号是否和之前的一样，如果不一样则断开之前的连接
-        // 对摄像头连接的socket进行判空
-        if (!(ip.equals(camera_ip) && portInt == camera_port) || cameraSocket == null) {
-            cameraSocket = null;
-            cameraTcp.stop();
-            cameraTcp.start(ip, portInt, new TCPLinks.ResultData() {
-                @Override
-                public void isConnected(Socket socket, Message message) {
-                    if (socket.isConnected()) {
-                        camera_ip = ip;
-                        camera_port = portInt;
-
-                        SpUtil.putString("camera_ip", camera_ip);
-                        SpUtil.putInt("camera_port", camera_port);
-
-                        cameraSocket = socket;
-
-                        message.what = 0;
-                        message.obj = socket;
-                        handler.sendMessage(message);
-                    }
-                }
-
-                @Override
-                public void error(Message message) {
-                    message.what = 1;
-                    handler.sendMessage(message);
-                }
-            });
-        } else {
-            App.showToast("已连接");
-        }*/
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_connected:
-                /*if (cameraTcp == null) {
-                    cameraTcp = new TCPLinks(cameraSocket);
-                }*/
                 connected();
                 break;
             case R.id.btn_back:

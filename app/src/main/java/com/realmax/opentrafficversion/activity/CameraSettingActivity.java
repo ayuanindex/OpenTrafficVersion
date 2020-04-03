@@ -27,23 +27,6 @@ public class CameraSettingActivity extends BaseActivity implements View.OnClickL
     private Button btn_back;
     private String camera_ip;
     private int camera_port;
-    /*private Handler handler = new Handler() {
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
-            int what = msg.what;
-            switch (what) {
-                case 0:
-                    cameraSocket = (Socket) msg.obj;
-                    App.showToast("连接成功");
-                    break;
-                case 1:
-                    App.showToast("连接失败");
-                    break;
-            }
-        }
-    };*/
-    /*private TCPLinks cameraTcp;*/
 
     @Override
     protected int getLayoutId() {

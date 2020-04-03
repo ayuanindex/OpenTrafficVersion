@@ -19,13 +19,6 @@ public abstract class NettyHandler extends SimpleChannelInboundHandler<ByteBuf> 
     private boolean flag = false;
     private StringBuffer strings = new StringBuffer();
 
-
-    /*@Override
-    public void channelActive(ChannelHandlerContext handlerContext) throws Exception {
-        super.channelActive(handlerContext);
-        Log.i(TAG, "channelActive: client channelActive..");
-    }*/
-
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, ByteBuf msg) throws Exception {
         /*Log.i(TAG, "channelRead0: client channelRead..哈哈哈");*/
