@@ -273,6 +273,16 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                 try {
                     JSONObject jsonObject = new JSONObject(msg);
                     checkedPosition = jsonObject.optInt("id");
+                    if (checkedPosition == 3) {
+                        checkedPosition = 4;
+                    } else if (checkedPosition == 4) {
+                        checkedPosition = 3;
+                    }
+                    if (checkedPosition == 7) {
+                        checkedPosition = 8;
+                    } else if (checkedPosition == 8) {
+                        checkedPosition = 7;
+                    }
                     Log.i(TAG, "getResultData: " + checkedPosition);
                     violate();
                 } catch (JSONException e) {

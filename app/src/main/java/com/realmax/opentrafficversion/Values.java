@@ -10,13 +10,13 @@ public class Values {
     /**
      * 官网获取的 API Key 更新为你注册的
      */
-    /*public static String CLIENT_ID = "miGMdcGzS9DAVdZezwNG29IE";*/
-    public static String CLIENT_ID = "FV4E08IcfHTs71lZvyVWqzIw";
+    public static String CLIENT_ID = "miGMdcGzS9DAVdZezwNG29IE";
+    /*public static String CLIENT_ID = "FV4E08IcfHTs71lZvyVWqzIw";*/
     /**
      * 官网获取的 Secret Key 更新为你注册的
      */
-    /*public static String CLIENT_SECRET = "NifyVDUXLWIaCbIBCzEaLvCEVGKuRiA2";*/
-    public static String CLIENT_SECRET = "egVNNuRlBE7l3vNCKAiKvcNR5Y19rZMp";
+    public static String CLIENT_SECRET = "NifyVDUXLWIaCbIBCzEaLvCEVGKuRiA2";
+    /*public static String CLIENT_SECRET = "egVNNuRlBE7l3vNCKAiKvcNR5Y19rZMp";*/
 
     public static String GRANT_TYPE = "client_credentials";
 
