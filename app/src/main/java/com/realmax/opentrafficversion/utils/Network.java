@@ -9,12 +9,15 @@ import androidx.annotation.RequiresApi;
 import com.google.gson.Gson;
 import com.realmax.opentrafficversion.App;
 import com.realmax.opentrafficversion.Values;
+import com.realmax.opentrafficversion.tencentCloud.OkHttpUtil;
+import com.realmax.opentrafficversion.tencentCloud.TencentCloudAPIDemo;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -72,7 +75,7 @@ public class Network {
      * @return
      */
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public static <T> void getORCString(Bitmap bitmap, String URL, Class<T> tClass, ResultData<? super T> resultData) {
+    public static <T> void getOrcString(Bitmap bitmap, String URL, Class<T> tClass, ResultData<? super T> resultData) {
         new Thread() {
             @Override
             public void run() {
@@ -100,6 +103,25 @@ public class Network {
                     e.printStackTrace();
                 }
 
+            }
+        }.start();
+    }
+
+    /**
+     * 腾讯云车牌识别
+     */
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public static <T> void getOrcString(Bitmap bitmap, Class<T> tClass, OkHttpUtil.Result<T> result) {
+        new Thread() {
+            @Override
+            public void run() {
+                super.run();
+                try {
+                    TreeMap<String, Object> params = TencentCloudAPIDemo.getParams(bitmap);
+                    OkHttpUtil.doPost(params, tClass, result);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }.start();
     }

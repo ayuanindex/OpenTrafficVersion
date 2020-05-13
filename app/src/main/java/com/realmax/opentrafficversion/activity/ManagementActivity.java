@@ -25,11 +25,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.j256.ormlite.dao.Dao;
 import com.realmax.opentrafficversion.R;
-import com.realmax.opentrafficversion.Values;
 import com.realmax.opentrafficversion.bean.ButtonBean;
 import com.realmax.opentrafficversion.bean.CameraBodyBean;
 import com.realmax.opentrafficversion.bean.CurrentCameraBean;
-import com.realmax.opentrafficversion.bean.ORCBean;
 import com.realmax.opentrafficversion.bean.ViolateBean;
 import com.realmax.opentrafficversion.bean.ViolateCarBean;
 import com.realmax.opentrafficversion.dao.OpenTrafficQueryDao;
@@ -38,6 +36,7 @@ import com.realmax.opentrafficversion.ftp.FTPUtil;
 import com.realmax.opentrafficversion.impl.CameraHandler;
 import com.realmax.opentrafficversion.impl.CustomerCallback;
 import com.realmax.opentrafficversion.impl.RemoteHandler;
+import com.realmax.opentrafficversion.tencentCloud.OkHttpUtil;
 import com.realmax.opentrafficversion.utils.EncodeAndDecode;
 import com.realmax.opentrafficversion.utils.L;
 import com.realmax.opentrafficversion.utils.Network;
@@ -54,6 +53,7 @@ import java.util.Date;
 import java.util.List;
 
 import io.netty.channel.ChannelHandlerContext;
+import okhttp3.Call;
 
 @SuppressLint("SetTextI18n")
 public class ManagementActivity extends BaseActivity implements View.OnClickListener {
@@ -426,11 +426,12 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
 
                 CurrentCameraBean currentCameraBean = violateBitmap.get(0);
                 Bitmap bitmap = currentCameraBean.getBitmap();
-                Network.getORCString(bitmap, Values.LICENSE_PLATE_ORC_URL, ORCBean.class, new Network.ResultData<ORCBean>() {
+                Network.getOrcString(bitmap, ORCResultBean.class, new OkHttpUtil.Result<ORCResultBean>() {
                     @Override
-                    public void result(ORCBean orcBean) {
+                    public void getData(ORCResultBean orcResultBean) {
+                        Log.d(TAG, "getData: 获取到的车牌号：" + orcResultBean);
                         String camera = buttonNames.get(currentCameraBean.getCameraPostion()).getName();
-                        if (orcBean != null) {
+                        if (orcResultBean != null && orcResultBean.getResponse().getError() == null) {
                             Date createTime = currentCameraBean.getCreateTime();
                             // 进行上传图片的操作
                             uploadImg(createTime.getTime() + "", bitmap);
@@ -438,7 +439,7 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                             Log.i(TAG, "result: 识别成功");
                             // 创建当前监控车辆对象的容器
                             ViolateCarBean obj = null;
-                            String numberPlate = orcBean.getWords_result().getNumber();
+                            String numberPlate = orcResultBean.getResponse().getNumber();
 
                             // 找出当前车辆之前是否有过违章记录
                             for (ViolateCarBean violateCarBean : violateCarBeans) {
@@ -525,7 +526,9 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                     }
 
                     @Override
-                    public void error() {
+                    public void error(Call call, IOException e) {
+                        e.printStackTrace();
+                        Log.d(TAG, "error: 识别车牌出现错误----" + e.getMessage());
                         message.obj = "抓拍，百度云测算失败！";
                         message.what = 0;
                         handler.sendMessage(message);
@@ -535,6 +538,23 @@ public class ManagementActivity extends BaseActivity implements View.OnClickList
                         orcNumberPlate();
                     }
                 });
+               /* Network.getOrcString(bitmap, Values.LICENSE_PLATE_ORC_URL, ORCBean.class, new Network.ResultData<ORCBean>() {
+                    @Override
+                    public void result(ORCBean orcBean) {
+
+                    }
+
+                    @Override
+                    public void error() {
+                        message.obj = "抓拍，百度云测算失败！";
+                        message.what = 0;
+                        handler.sendMessage(message);
+
+                        violateBitmap.remove(0);
+                        // 重新调用此方法继续识别图片集合中的违章车牌
+                        orcNumberPlate();
+                    }
+                });*/
             }
         }.start();
     }
